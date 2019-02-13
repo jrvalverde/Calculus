@@ -1,0 +1,183 @@
+/**
+ *  @file matrix.h
+ *
+ *  @brief  2D matrix manipulation functions
+ *
+ *	Generic implementation of bidimensional matrix
+ *  calculus. It contains functions to allocate memory
+ *  space and, by this time, elementary matrix calculus.
+ *
+ *  All matrix operations should be done using the interfaces
+ * provided. If efficiency is a must, you may try defining
+ * MAT_OPTIMIZE and see if the alternative code provided with
+ * its shortcuts may increase speed.
+ *
+ *  In general, and during development in particular, you are
+ * advised to ALWAYS define MAT_PARANOIA to enable bounds
+ * checking. This may slow down some operations, most notably
+ * accessing individual matrix elements but will reduce the 
+ * possibility of errors passing unnoticed. Only if you are
+ * really confident that you don't have errors in your code
+ * should you venture to risk undefining MAT_PARANOIA.
+ *
+ *  @pre	stdio.h
+ *  @pre	math.h
+ *  @pre	stdlib.h
+ *  @pre    	bits/nan.h
+ *  @pre	portable.h
+ *
+ *
+ *  @note    Estoy hasta los cojones.
+ *	    Today (1 - oct - 1988) is my father's birthday
+ *	and here I am like a dumb loser.
+ *
+ *  @bug    There must be some bug in the matrix allocation code for
+ *  	the optimized implementation.
+ *
+ *  @todo   Debugging the MAT_OPTIMIZE implementation
+ *
+ *  @todo    I intend to add functions for the solution
+ *	of systems of equations, manipulation of eigenvalues
+ *	and eigenvectors.
+ *
+ *  @see    mat_test.c	    Is an auxiliary module with
+ *	the test code of these functions used to debug this
+ *	module (last time everything went OK).
+ *
+ *  @see    mat_housekeep.c To learn how to create/destroy matrices.
+ *
+ *  @author    José Ramón Valverde Carrillo.
+ *
+ *  @version	2.0
+ *
+ *  @date   11 - february - 2004    v2.0
+ *
+ *  @date    1 - october - 1988     Last modification of v1.0
+ *
+ *	COPYRIGHT:
+ *	    © YoEgo.	Since I have no cash, I can't
+ *	register this (nor do I believe I should). So
+ *	this module is left in the PUBLIC DOMAIN.
+ *	    It is furthermore forbidden its use for
+ *	commercial purposes unless I get a share on
+ *	the profits.
+ *	    I say.
+ *						YoEgo.
+ *
+ * $Id: matrix.h,v 1.1 2004/03/05 18:26:06 jr Exp $
+ * $Log: matrix.h,v $
+ * Revision 1.1  2004/03/05 18:26:06  jr
+ * Initial revision
+ *
+ */
+
+
+/** @def MAT_PARANOIA enable additional checking at the cost of efficiency */
+#define MAT_PARANOIA
+
+typedef double real;
+
+/** @typedef struct matrix matrix
+ *
+ *  @brief A two-dimensional matrix type.
+ *
+ *  This type should be used as a black box. All accesses to matrix
+ *  elements should be done through the functions provided in mat_access.c
+ */
+ 
+/** 
+ *  @brief Implementation of a 2D-matrix
+ *
+ *  A matrix A is a set of values grouped as a table arranged by
+ *  rows and columns: a matrix m x n (rows x columns) is
+ @f[
+ A = \pmatrix {
+    	a_{11} & a_{12} & \cdots & a_{1n} \cr
+	a_{21} & a_{22} & \cdots & a_{2n} \cr
+	\vdots & \vdots & \ddots & \vdots \cr
+	a_{m1} & a_{m2} & \cdots & a_{mn} \cr }
+ @f]
+ * where a<sub>ij</sub> are the elements of A (i = 1..m, j = 1..n)
+ * Vectors are matrices with only one row or column: they only need
+ * one subindex.
+ *
+ * Sometimes it may be convenient to consider special rows or columns:
+ *
+ *  R<sub>i</sub>(A) -- row i.
+ *
+ *  C<sub>j</sub>(A) -- row j.
+ *
+ * @note Please, note that all subindexes are offset at one (1)
+ */
+typedef struct matrix {
+    int rows;	    /**< number of rows */
+    int cols;	    /**< number of columns */
+    real **values;  /**< matrix values arranged as an array of real vectors */
+} *matrix;
+
+#define MAT_NOMEMORY	(-1)	/**< ERROR: not enough memory */
+#define MAT_BOUNDSCHECK	(-2)	/**< ERROR: during bounds checking */
+#define MAT_SINGULAR  	(-3)	/**< ERROR: matrix is singular */
+#define MAT_NOTSQUARE	(-3)	/**< ERROR: not a square marix */
+
+
+/*----------------------------------------------------------------*/
+/*  	    	    	MEMORY MANAGEMENT   	    	    	  */
+/*----------------------------------------------------------------*/
+
+extern status mat_alloc(matrix *pmat, int rows, int cols);
+extern status mat_free(matrix mat);
+
+/*-------------------------------------------------------------------*/
+/*  	    	    	    MATRIX ACCESS   	    	    	     */
+/*-------------------------------------------------------------------*/
+
+extern int mat_rows(matrix mat);
+extern int mat_cols(matrix mat);
+extern real **mat_values(matrix mat);
+extern real *mat_row(matrix mat, int row_number);
+extern real mat_element(matrix mat, int row, int col);
+
+/*--------------------------------------------------------------*/
+/*  	    	    	MATRIX INITIALIZATION	    	        */
+/*--------------------------------------------------------------*/
+
+extern status mat_set(matrix mat, int row, int col, real value);
+extern status mat_init(matrix mat, real value);
+extern status mat_identity(matrix mat);
+
+/*----------------------------------------------------------------*/
+/*  	    	    	MATRIX OPERATIONS   	    	    	  */
+/*----------------------------------------------------------------*/
+
+extern status mat_assign(matrix dest, matrix orig);
+extern status mat_transpose(matrix trn, matrix mat);
+
+/*----------------------------------------------------------------*/
+/*  	    	    	MATRIX ARITHMETIC   	    	    	  */
+/*----------------------------------------------------------------*/
+
+extern status mat_sum(matrix result, matrix mat1, matrix mat2);
+extern status mat_substract(matrix result, matrix mat1, matrix mat2);
+extern status mat_multiply(matrix prod, matrix fact1, matrix fact2);
+extern status mat_scalar_product(matrix scprod, matrix mat, real lambda);
+
+/*----------------------------------------------------------------*/
+/*  	    	    	MATRIX PROPERTIES   	    	    	  */
+/*----------------------------------------------------------------*/
+
+extern boolean mat_is_square(matrix mat);
+extern boolean mat_is_symmetric(matrix mat);
+extern boolean mat_is_identity(matrix mat);
+extern boolean mat_is_null(matrix mat) ;
+extern status mat_invert(matrix B, matrix C);
+
+
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*							*
+*		END OF MODULE MATRIX.H			*
+*		    (T'was time!)			*
+*							*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*/

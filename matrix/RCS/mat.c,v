@@ -1,0 +1,1114 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	2004.02.22.21.13.12;	author jr;	state Exp;
+branches;
+next	;
+
+
+desc
+@Matrix calculus [j]
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/**
+ *  \file mat.c
+ *
+ *  \brief  2D matrix manipulation functions
+ *
+ *	Generic implementation of bidimensional matrix
+ *  calculus. It contains functions to allocate memory
+ *  space and, by this time, elementary matrix calculus.
+ *
+ *  All matrix operations should be done using the interfaces
+ * provided. If efficiency is a must, you may try defining
+ * MAT_OPTIMIZE and see if the alternative code provided with
+ * its shortcuts may increase speed.
+ *
+ *  In general, and during development in particular, you are
+ * advised to ALWAYS define MAT_PARANOIA to enable bounds
+ * checking. This may slow down some operations, most notably
+ * accessing individual matrix elements but will reduce the 
+ * possibility of errors passing unnoticed. Only if you are
+ * really confident that you don't have errors in your code
+ * should you venture to risk undefining MAT_PARANOIA.
+ *
+ *  \pre	stdio.h
+ *  \pre	math.h
+ *  \pre	unix.h
+ *  \pre    	storage.h
+ *
+ *  \pre	portable.h
+ *
+ *
+ *  \note    Estoy hasta los cojones.
+ *	    Today (1 - oct - 1988) is my father's birthday
+ *	and here I am like a dumb loser.
+ *
+ *  \todo    I intend to add functions for the solution
+ *	of systems of equations, manipulation of eigenvalues
+ *	and eigenvectors.
+ *
+ *  \see    mat_test.c	    Is an auxiliary module with
+ *	the test code of these functions used to debug this
+ *	module (last time everything went OK).
+ *
+ *  \author    José Ramón Valverde Carrillo.
+ *
+ *  \version	2.0
+ *
+ *  \date   11 - february - 2004    v2.0
+ *
+ *  \date    1 - october - 1988     Last modification of v1.0
+ *
+ *	COPYRIGHT:
+ *	    © YoEgo.	Since I have no cash, I can't
+ *	register this (nor do I believe I should). So
+ *	this module is left in the PUBLIC DOMAIN.
+ *	    It is furthermore forbidden its use for
+ *	commercial purposes unless I get a share on
+ *	the profits.
+ *	    I say.
+ *						YoEgo.
+ *
+ * $Id$
+ * $Log$
+ */
+
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <bits/nan.h>
+
+#include "portable.h"
+
+/** \def MAT_PARANOIA enable additional checking at the cost of efficiency */
+#define MAT_PARANOIA
+
+typedef double real;	/**< precision to use */
+
+/** \typedef struct matrix matrix
+ *
+ *  \brief A two-dimensional matrix type.
+ *
+ *  This type should be used as a black box. All accesses to matrix
+ *  elements should be done through the functions provided.
+ */
+ 
+/** 
+ *  \brief Implementation of a 2D-matrix
+ *
+ *  A matrix A is a set of values grouped as a table arranged by
+ *  rows and columns: a matrix m x n (rows x columns) is
+ \f[
+ A = \pmatrix {
+    	a_{11} & a_{12} & \cdots & a_{1n} \cr
+	a_{21} & a_{22} & \cdots & a_{2n} \cr
+	\vdots & \vdots & \ddots & \vdots \cr
+	a_{m1} & a_{m2} & \cdots & a_{mn} \cr }
+ \f]
+ * where a<sub>ij</sub> are the elements of A (i = 1..m, j = 1..n)
+ * Vectors are matrices with only one row or column: they only need
+ * one subindex.
+ *
+ * Sometimes it may be convenient to consider special rows or columns:
+ *
+ *  R<sub>i</sub>(A) -- row i.
+ *
+ *  C<sub>j</sub>(A) -- row j.
+ *
+ * \note Please, note that all subindexes are offset at one (1)
+ */
+typedef struct matrix {
+    int rows;	    /**< number of rows */
+    int cols;	    /**< number of columns */
+    real **values;  /**< matrix values arranged as an array of real vectors */
+} *matrix;
+
+#define MAT_NOMEMORY	(-1)	/**< ERROR: not enough memory */
+#define MAT_BOUNDSCHECK	(-2)	/**< ERROR: during bounds checking */
+#define MAT_SINGULAR  	(-3)	/**< ERROR: matrix is singular */
+#define MAT_NOTSQUARE	(-3)	/**< ERROR: not a square marix */
+
+/*----------------------------------------------------------------*/
+/*  	    	    	MEMORY MANAGEMENT   	    	    	  */
+/*----------------------------------------------------------------*/
+
+/** \defgroup matrix_allocation 
+ * @@{ 
+ */
+
+/**
+ *  \fn public status mat_alloc(matrix *pmat, int rows, int cols);
+ *
+ *  \brief Allocate a new, uninitialized 2-D matrix
+ *
+ *  Allocates memory space for a bidimensional matrix
+ *  of 1..rows x 1..cols elements
+ *
+ *  \param pmat     address of the matrix to allocate
+ *  \param rows     the number of rows in the 2D-matrix
+ *  \param cols     the number of columns in the 2D-matrix
+ *
+ *  \return 	    success if all went well, an error code otherwise
+ *
+ *  \note   if MAT_PARANOIA has been defined, parameter checking is performed
+ */
+
+public status mat_alloc(matrix *pmat, int rows, int cols)
+{
+    auto int i, j;
+    auto real **row_vector;
+    auto real *this_row;
+    matrix mat;
+
+    *pmat = NULL;
+#   ifdef MAT_PARANOIA
+    /* Check dimensions for validity */
+    if ((rows <= 0) || (cols <= 0)) {
+ 	return MAT_BOUNDSCHECK;
+    }
+#   endif
+
+    /* allocate structure */
+    mat = (matrix) malloc(sizeof(struct matrix));
+    if (mat == NULL)
+	return MAT_NOMEMORY;
+
+    /* allocate array of vectors */
+    if ((row_vector = malloc(rows * sizeof(real *))) == NULL) {
+	free(mat);
+	return MAT_NOMEMORY;
+    }
+    /* make one-offset */
+    row_vector--;
+    mat->values = row_vector;
+
+#   ifndef MAT_OPTIMIZE
+    /* allocate each and every vector */
+    for (i = 1; i <= rows; i++) {
+	if ((this_row = malloc(cols * sizeof(real))) == NULL) {
+	    /* roll back and free any allocated vectors */
+	    for (j = i - 1; j >= 1; j--) {
+		/* this shouldn't execute if initially i == 1 */
+		this_row = mat->values[j];
+		/* make row zero-offset */
+		this_row++;
+		free(this_row);
+	    }
+	    row_vector = mat->values;
+	    row_vector++;
+	    free(row_vector);
+	    free(mat);
+	    return MAT_NOMEMORY;
+	}
+	/* make row one-offset */
+	this_row--;
+	mat->values[i] = this_row;
+    }
+#   else
+    /* trick: we allocate all rows at once */
+    if ((this_row = malloc(rows * cols, sizeof(real))) == NULL) {
+	free(mat->values);
+	free(mat);
+	return MAT_NOMEMORY;
+    }
+    /* make zero-offset */
+    this_row--;
+    for (i = 1; i <= rows; i++) {
+	/* compute address of each row */
+	/* this should be much faster than allocating each separately */
+	/* and will allow for other speed-ups */
+	this_row += cols;
+	mat->values[i] = this_row;
+    }
+#   endif
+
+    /* fill in matrix dimensions */
+    mat->rows = rows;
+    mat->cols = cols;
+
+    *pmat = mat;
+    return SUCCESS;
+}
+
+/**
+ *  \fn public void mat_free(matrix mat)
+ *
+ *  \brief free a 2D-matrix
+ *
+ *  \param mat	the matrix to be freed, must have been allocated by mat_alloc()
+ *
+ *  \return SUCCESS if all went well
+ */
+public status mat_free(matrix mat)
+{
+    int i, maxrow;
+    real *row;
+    real **rows_vector;
+
+    if (mat == NULL)
+	return SUCCESS;
+
+    /* NOTE: mat should have been allocated through mat_alloc */
+    /* if not, or if mat->rows is corrupted, this will bomb out */
+    maxrow = mat->rows;
+    for (i = 1; i <= maxrow; i++) {
+	row = mat->values[i];
+	row++;
+	free(row);
+    }
+    rows_vector = mat->values;
+    rows_vector++;
+    free(rows_vector);
+    free(mat);
+    return SUCCESS;
+}
+
+/** @@} */
+
+
+/*-------------------------------------------------------------------*/
+/*  	    	    	    MATRIX ACCESS   	    	    	     */
+/*-------------------------------------------------------------------*/
+
+/** \defgroup matrix_access
+ * @@{
+ */
+
+/** 
+ * \brief return number of rows of a matrix
+ *
+ * \param mat a matrix allocated by mat_alloc() whose row order we want to know
+ * \return  the number of rows of the matrix
+ */
+public int mat_rows(matrix mat)
+{
+    return mat->rows;
+}
+
+/**
+ * \brief return number of columns of a matrix
+ *
+ * \param mat a matrix allocated by mat_alloc() whose column dimension we want to know
+ * \return  the number of columns of the matrix
+ */
+public int mat_cols(matrix mat)
+{
+    return mat->cols;
+}
+
+
+/**
+ *  \brief return a (handy) pointer to the table of values of a matrix
+ *
+ *  \param mat the matrix whose value table we want to access
+ *  \return a 2D table with the values of the matrix arranged by rows
+ *  	    and columns.
+ */
+public real **mat_values(matrix mat)
+{
+    return mat->values;
+}
+
+/**
+ * \brief   return a row of a matrix
+ *
+ *  This function returns a pointer to the values of the specified row
+ *  R<sub>i</sub>(mat)
+ *
+ *  \param mat	    	a matrix allocated by mat_alloc
+ *  \param row_number	the index of the row to return
+ *  \return 	    	a pointer to an array [1..dim] containing the row values
+ */
+public real *mat_row(matrix mat, int row_number)
+{
+#   ifdef MAT_PARANOIA
+    if (row_number > mat->rows)
+
+#endif
+    return mat->values[row_number];
+}
+
+
+/**
+ *  \fn public real mat_element(matrix mat, int row, int col)
+ *
+ *  \brief return value of matrix element mat[row][col]
+ *
+ *  \param mat	the matrix whose value we want to set
+ *  \param row	value row offset
+ *  \param col	value column offset
+ *
+ *  \return the value of the element.
+ *
+ *  \note if MAT_PARANOID is defined, extra bound checking is
+ *  	performed and IEEE NaN returned on error.
+ */
+public real mat_element(matrix mat, int row, int col)
+{
+#   ifdef MAT_PARANOIA
+    /* check bounds */
+    if ((row <= 0) || (row > mat->rows) || (col <= 0) || (col > mat->cols))
+    	/* IEEE Not A Number */
+	return NAN;
+#   endif
+
+    return mat->values[row][col];
+}
+
+/** @@} */
+
+/*--------------------------------------------------------------*/
+/*  	    	    	MATRIX INITIALIZATION	    	        */
+/*--------------------------------------------------------------*/
+
+/** \defgroup matrix_initialization
+ * @@{
+ */
+
+/**
+ *  \fn mat_set(matrix mat, int row, int col, real value)
+ *
+ *  \brief set matrix element mat[row][col] to value
+ *
+ *  \param mat	the matrix whose value we want to set
+ *  \param row	value row offset
+ *  \param col	value column offset
+ *  \param value    value to assign to mat[row][col]
+ *
+ *  \return SUCCESS if all went well, an error code otherwise
+ *
+ *  \note if MAT_PARANOID is defined, extra bound checking is
+ *  	performed at a high execution penalty.
+ */
+public status mat_set(matrix mat, int row, int col, real value)
+{
+#   ifdef MAT_PARANOIA
+    /* check bounds */
+    if ((row <= 0) || (row > mat->rows) || (col <= 0) || (col > mat->cols))
+	return MAT_BOUNDSCHECK;
+#   endif
+
+    mat->values[row][col] = value;
+    return SUCCESS;
+}
+
+
+/**
+ *   \brief Set all matrix elements to the specified value
+ *
+ *  \param mat	a matrix allocated by mat_alloc() whose values will be all
+ *  	    	set to the real value specified
+ *  \param value the value to assign to all matrix elements
+ *
+ *  \return SUCCESS if all went well, an error code otherwise
+ *
+ */
+public status mat_init(matrix mat, real value)
+{
+#ifndef MAT_OPTIMIZE
+    register int i, j, maxrow, maxcol;
+    real **val;
+
+    val = mat->values;
+    maxrow = mat->rows;
+    maxcol = mat->cols;
+    for (i = 1; i <= maxrow; i++)
+	for (j = 1; j <= maxcol; j++)
+	    val[i][j] = value;
+#else
+    register int i, size;
+    register real *values;
+
+    /* we know all rows were allocated contiguously starting
+     * at mat->values[1] hence we may save on pointer indirections */
+    size = mat->rows * mat->cols;
+    values = mat->values[1];
+    for (i = 1; i <= size; i++)
+	values[i] = value;
+#endif
+    return SUCCESS;
+}
+
+
+/**
+ *  \brief Compute the identity matrix of dimension [n] x [n]:
+ *   	    Every element ij / i <> j is 0, every ij / i = j is 1.
+ *
+ *  \param mat	    	a matrix allocated by mat_alloc() that will be set to
+ *  	    	    	the identity matrix
+ *
+ *  \return SUCCESS if all went well, an error code otherwise
+ *
+ */
+public status mat_identity(matrix mat)
+{
+    register int i, j;
+    real **val;
+
+#   ifdef MAT_PARANOIA
+    if (mat->rows != mat->cols)
+	/* must be a square matrix */
+	return MAT_NOTSQUARE;
+#   endif
+
+    val = mat->values;
+    for (i = 1; i <= mat->rows; i++) {
+	for (j = 1; j <= mat->cols; j++)
+	    val[i][j] = 0.0;
+	val[i][i] = 1.0;
+    }
+    return SUCCESS;
+}
+
+/* @@} */
+
+/*----------------------------------------------------------------*/
+/*  	    	    	MATRIX OPERATIONS   	    	    	  */
+/*----------------------------------------------------------------*/
+
+/** \defgroup matrix_operations
+ * @@{
+ */
+
+/**
+ * \brief MAT dest = orig
+ *
+ * Transfer ([m] x [n]) elements from 2 to 1.
+ *
+ * Assigns the values of one matrix to another. Both matrices must have
+ * the same dimensions, otherwise an error result will occur.
+ *
+ * If the origin matrix is NULL, then the destination matrix will be
+ * set to the null matrix (i.e. all of its elements initialized to zero).
+ *
+ * \param dest	the destination matrix
+ * \param orig	the origin matrix
+ *
+ *  \return SUCCESS if all went well, an error code otherwise
+ *
+ */
+public status mat_assign(matrix dest, matrix orig)
+{
+#ifndef MAT_OPTIMIZE
+    register int i, j, maxrow, maxcol;
+    real **val1, **val2;
+#else
+    register int i, size;
+    real *element1;
+    real *element2;
+
+#endif
+
+    if (orig == NULL)
+    	return mat_init(dest, 0.0);
+
+#ifdef MAT_PARANOIA
+    if ((dest->rows != orig->rows) || (dest->cols != orig->cols))
+	return MAT_BOUNDSCHECK;
+#endif
+
+#ifndef MAT_OPTIMIZE
+    maxrow = dest->rows;
+    maxcol = dest->cols;
+    val1 = dest->values;
+    val2 = orig->values;
+    for (i = 1; i <= maxrow; i++)
+	for (j = 1; j <= maxcol; j++)
+	    val1[i][j] = val2[i][j];
+#else
+    /* we know all values are stored contiguously after mat->values[1][1] */
+    size = dest->rows * dest->cols;
+    element1 = dest->values[1];
+    element2 = orig->element[1];
+    for (i = 1; i <= size; i++) {
+	/* element1[i] = element2[i]; */
+	*element1 = *element2;
+	element1++;
+	element2++;
+    }
+#endif
+    return SUCCESS;
+}
+
+/**
+ * \brief MAT trn = TRN(mat)
+ *  	  Compute the transpose of a matrix
+ *
+ * The transpose A<sup>T</sup> of a matrix A is
+ * A' = A<sup>T</sup> / row A' = col A =>                
+ *
+ *  (A)<sub>ij</sub> = (A<sup>T</sup>)<sub>ji</sub>      
+ *
+ * Thus, if A<sub>m·n</sub>, then A'<sub>n.m</sub> =>	 
+ *
+ *  If A · B = C -> C' = A' · B'    	    	    	 
+ *
+ * We may therefore describe a column vector as a row vector
+ *
+ \f[
+ \pmatrix {
+    x_1 \cr
+    x_2 \cr
+    \cdots \cr
+    x_{n-1} \cr
+    x_n \cr
+    } = \pmatrix {x_1 & x_2 & \cdots & x_n \cr }
+ \f]
+ *
+ * \param trn	a matrix where we will store the transpose
+ * \param mat	the matrix whose transpose we want to take
+ */
+public status mat_transpose(matrix trn, matrix mat)
+{
+
+    register int i, j;
+
+#   ifdef MAT_PARANOIA
+    /* Check dimensions */
+    if ((trn->rows != mat->cols) || (trn->cols != mat->rows))
+	return MAT_BOUNDSCHECK;
+#   endif
+
+#   ifndef MAT_OPTIMIZE
+    for (i = 1; i <= mat->rows; i++)
+	for (j = 1; j <= mat->cols; j++)
+	    trn->values[j][i] = mat->values[i][j];
+#   else
+    /* we know all elements are stored contiguously */
+    {
+	int i, size;
+	real *trn_elem;
+	real *mat_elem;
+
+	size = mat->rows * mat->cols;
+	trn_elem = trn->values[1] + size;
+	mat_elem = mat->values[1];
+	for (i = 1; i <= size; i++) {
+	    /* trn_elem[size - i + 1] = mat_elem[size] */
+	    *trn_elem = *mat_elem;
+	    trn_elem--;
+	    mat_elem++;
+	}
+    }
+#   endif
+    return SUCCESS;
+}
+
+
+/**
+ * \brief MAT B = INV ( C );
+ *
+ *   Computes the inverted matrix of C, which is a square matrix n x n
+ *   and stores the result on B.
+ *   The algorithm employed is a modification of Gauss' method. This
+ *   is probably not the best (nor is it the nicest implementation),
+ *   but for the moment will do.
+ *
+ *   Given the identity matrix I<sub>nn</sub>, we may think of another
+ *   such that
+ *
+ *  A B = B A = I => B = A<sup>-1</sup>
+ *
+ *  A A<sup>-1</sup> = I = A<sup>-1</sup> A
+ *
+ *   Using the cofactors of A<sub>ij</sub> we may compute
+ *
+ *  A<sup>-1</sup> = 1 / |A| · adj(A)
+ *
+ *   (calculating through the adjunct matrix). If |A| = 0 then it is not
+ *  defined and A is SINGULAR.
+ *   
+ *   The inverse of a matrix A, if it exists, is unique and may be
+ *   found:
+ *   We first form for A<sub>nn</sub> the matrix A<sub>n x 2n</sub>
+ *   \f[ (A, I) = \pmatrix {
+    	a_{11} & a_{12} & \cdots & a_{1n} & 1 & 0 & \cdots & 0 \cr
+	a_{21} & a_{22} & \cdots & a_{2n} & 0 & 1 & \cdots & 0  \cr
+	\vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \ddots & 0  \cr
+	a_{n1} & a_{n2} & \cdots & a_{nn} & 0 & 0 & \cdots & 1  \cr }
+    \f]
+ *   That is, the left half is A and the right half I, the identity
+ *   matrix. Using a modified Gauss method we transform the former
+ *   matrix into
+ *   \f[ (I, B) =
+  \pmatrix {
+    1	   & 0      & \cdots & 0    &   b_{11} & b_{12} & \cdots & b_{1n}\cr
+    0	   & 1      & \cdots & 0    &   b_{21} & b_{22} & \cdots & b_{2n}\cr
+    \vdots & \vdots & \ddots & 0    &   \vdots & \vdots & \ddots & \vdots\cr
+    0	   & 0      & \cdots & 1    &   b_{n1} & b_{n2} & \cdots & b_{nn}\cr }
+    \f]
+ *   Now the left half is I and the right half, B is the inverse of A.
+ *
+ *   To avoid changing matrix C we get first a working copy that
+ *   we store in matrix A, whose space is reserved ex-profeso and
+ *   is freed upon termination.
+ *
+ * \callgraph
+ */
+
+public status mat_invert(matrix B, matrix C)
+			    	/* matrices inverse and to invert       */
+    				/* both are square matrices n x n       */
+{
+    int i, j, k, l;		/* indexes                  */
+    int n;  	    	    	/* dimension                */
+    real temp;		    	/* auxiliary variable       */
+    matrix A;			/* backup matrix            */
+    boolean singular = FALSE;	/* TRUE if c is singular    */
+    real **a, **b;
+
+    n = B->rows;
+    mat_alloc(&A, n, n);	    	/* create A */
+    if (A == NULL)		/* (if we can) */
+	return MAT_NOMEMORY;
+    mat_assign(A, C);	    	/* copy C into A to avoid changing it */
+
+    /* make B equal the identity matrix */
+    mat_identity(B);
+
+    a = A->values;
+    b = B->values;
+    
+    for (j = 1; j <= n; j++) {
+	for (i = j; i <= n; i++)
+	    if (a[i][j] != 0)	    	/* is it singular ?        */
+		goto __Compute__;	/* NO               	   */
+	    /* The matrix is singular, EXIT */
+    	    mat_free(A);
+	    return MAT_SINGULAR;
+
+      __Compute__:
+	for (k = 1; k <= n; k++) {
+	    /* swap a[j][k] and a[i][k] */
+	    temp = a[j][k];
+	    a[j][k] = a[i][k];
+	    a[i][k] = temp;
+
+	    /* swap inv[j][k] and inv[i][k] */
+	    temp = b[j][k];
+	    b[j][k] = b[i][k];
+	    b[i][k] = temp;
+	}			/* K */
+
+	temp = 1 / a[j][j];
+	for (k = 1; k <= n; k++) {
+	    a[j][k] *= temp;
+	    b[j][k] *= temp;
+	}			/* K */
+
+	for (l = 1; l <= n; l++) {
+	    if (l != j) {
+		temp = -a[l][j];
+		for (k = 1; k <= n; k++) {
+		    a[l][k] += (temp * a[j][k]);
+
+		    b[l][k] += (temp * b[j][k]);
+		}		/* K */
+	    }			/* IF */
+	}			/* L */
+    }				/* J */
+    /* B = inverse of C                     */
+    /* A is no longer needed, kiss it good bye.  */
+    mat_free(A);
+    if (singular == TRUE)
+	return (MAT_SINGULAR);	/* so sorry     */
+    else
+	return (SUCCESS);	/* happy end    */
+}
+
+/** @@} */
+
+/*----------------------------------------------------------------*/
+/*  	    	    	MATRIX ARITHMETIC   	    	    	  */
+/*----------------------------------------------------------------*/
+
+/** \defgroup matrix_arithmetic
+ * @@{
+ */
+ 
+
+/** 
+ * \brief MAT C = A + B;
+ *
+ *  sum two matrices and store result in another.
+ *
+ *  function mat_sum adds two matrices and stores the result in a
+ *  separate one. Both matrices must have the same number of rows
+ *  and columns:
+ *
+ *  \f[
+    \sum A_{mn} + B_{mn} = C_{mn} / c_{ij} = a_{ij} + b_{ij} 
+    (i = 1 \ldots m, j = 1 \ldots n)
+    \f]
+ *
+ * \param result    a matrix to store the sum
+ * \param mat1	    sumand
+ * \param mat2	    sumand
+ *
+ *  \return SUCCESS if all went well, an error code otherwise
+ *
+ */
+public status mat_sum(matrix result, matrix mat1, matrix mat2)
+{
+#   ifdef MAT_PARANOIA
+    /* check bounds */
+    if ((result->rows != mat1->rows) || (mat1->rows != mat2->rows) ||
+	(result->cols != mat1->cols) || (mat1->cols != mat2->cols))
+	return MAT_BOUNDSCHECK;
+#   endif
+
+#ifndef MAT_OPTIMIZE
+    {
+	register int i, j;
+	real **sum, **val1, **val2;
+
+	sum = result->values;
+	val1 = mat1->values;
+	val2 = mat2->values;
+	for (i = 1; i <= result->rows; i++)
+	    for (j = 1; j <= result->cols; j++)
+		sum[i][j] = val1[i][j] + val2[i][j];
+    }
+#else
+    {
+	/* we know elements are stored contiguously, hence we can
+	   treat is as unidimensional as well, saving on indirections */
+	register int i, size;
+	real *res, *elem1, *elem2;
+
+	size = result->rows * result->cols;
+	res = result->values[1];
+	elem1 = mat1->values[1];
+	elem2 = mat2->values[1]
+	    for (i = 1; i <= size; i++)
+	    res[i] = elem1[i] + elem2[i];
+    }
+#endif
+    return SUCCESS;
+}
+
+
+/**
+ * \brief MAT res = mat1 - mat2
+ *
+ * Substracts mat2 from mat1 and stores result in res.
+ *
+ *  Subtract one matrix from another and store the result in another one.
+ *  All three matrices must have the same dimensions:
+ *
+ *  \f[ A_{mn} - B_{mn} = E_{mn} / e_{ij} = a_{ij} - b_{ij}
+ *  (i = 1 \ldots m; j = 1 \ldots n) \f]
+ *
+ * \param result	The resulting substraction matrix
+ * \param mat1	Minuend matrix
+ * \param mat2	Substraend matrix
+ *
+ * \return SUCCESS if all went well, an error code otherwise
+ *
+ */
+public status mat_substract(matrix result, matrix mat1, matrix mat2)
+{
+#   ifdef MAT_PARANOIA
+    /* check bounds */
+    if ((result->rows != mat1->rows) || (mat1->rows != mat2->rows) ||
+	(result->cols != mat1->cols) || (mat1->cols != mat2->cols))
+	return MAT_BOUNDSCHECK;
+#   endif
+
+#ifndef MAT_OPTIMIZE
+    {
+	register int i, j;
+	real **sub, **val1, **val2;
+
+	sub = result->values;
+	val1 = mat1->values;
+	val2 = mat2->values;
+	for (i = 1; i <= result->rows; i++)
+	    for (j = 1; j <= result->cols; j++)
+		sub[i][j] = val1[i][j] - val2[i][j];
+    }
+#else
+    {
+	/* we know elements are stored contiguously, hence we can
+	   treat is as unidimensional as well, saving on indirections */
+	register int i, size;
+	real *res, *elem1, *elem2;
+
+	size = result->rows * result->cols;
+	res = result->values[1];
+	elem1 = mat1->values[1];
+	elem2 = mat2->values[1]
+	    for (i = 1; i <= size; i++)
+	    res[i] = elem1[i] - elem2[i];
+    }
+#endif
+    return SUCCESS;
+}
+
+
+/**
+ * \brief   MAT prod[m][p] = fact1[m][n] * fact2[n][p];
+ *  Compute the product of two matrices
+ *
+ * Compute the product of two matrices and store result in another one.
+ * The number of columns in the first factor matrix must be equal to
+ * the number of rows in the second factor matrix. The resulting product 
+ * matrix will have same number of rows as first factor and same number
+ * of columns as second factor.
+ *
+ * Let A<sub>mn</sub> and B<sub>np</sub>:
+ * \f[
+    A · B = C / A_{mn} B_{np} = C_{mp} /
+    c_{ij} = \sum_{k=1}^n a_{ik} b_{kj}
+    (i = 1 \ldots m; j = 1 \ldots p)
+   \f]
+ *
+ * If p == 1 (i. e. B is a vector with a single column) then
+ * A · x for A<sub>mn</sub> and x<sub>n1</sub> is
+ * \f[
+    Y_{m1} / y_i = \sum_{k=1}^n a_{ik} x_k  (i = 1 \ldots m)
+ \f]
+ *
+ * \param prod	a matrix to store the resulting product
+ * \param fact1 first factor to multiply
+ * \param fact2 second factor matrix to multiply
+ *
+ *  \return SUCCESS if all went well, an error code otherwise
+ *
+ */
+public status mat_multiply(matrix prod, matrix fact1, matrix fact2)
+{
+#   ifdef MAT_PARANOIA
+    if ((prod->rows != fact1->rows) ||
+	(prod->cols != fact2->cols) || (fact1->cols != fact2->rows))
+	return MAT_BOUNDSCHECK;
+#   endif
+    {
+	auto int i, j, k;
+	auto int m, n, p;
+	auto real temp;
+	auto real **p_vals, **f1_vals, **f2_vals;
+	m = prod->rows;
+	n = fact1->cols;
+	p = fact2->cols;
+	p_vals = prod->values;
+	f1_vals = fact1->values;
+	f2_vals = fact2->values;
+
+	for (i = 1; i <= m; i++)
+	    for (j = 1; j <= p; j++) {
+		temp = 0.0;
+		for (k = 1; k <= n; k++)
+		    temp += (f1_vals[i][k] * f2_vals[k][j]);
+		p_vals[i][j] = temp;
+	    }
+    }
+    return SUCCESS;
+}
+
+
+/**
+ *  \brief compute the scalar product 
+ *
+ *  Compute the product of a matrix by a scalar quantity and store
+ * the result in another matrix: \f[
+    B = \lambda \cdot A (\lambda = constant)
+    \f]\f[
+    b_{ij} = \lambda \cdot a_{ij} (i = 1 \ldots m, j = 1 \ldots n)
+ \f]
+ *
+ * \param scprod    the matrix to store the result
+ * \param mat	    the matrix to multiply
+ * \param lambda    the scalar operand
+ *
+ *  \return SUCCESS if all went well, an error code otherwise
+ *
+ */
+public status mat_scalar_product(matrix scprod, matrix mat, real lambda)
+{
+#ifndef MAT_OPTIMIZE
+    register int i, j;
+
+    for (i = 1; i <= mat->rows; i++)
+	for (j = 1; j <= mat->cols; j++)
+	    scprod->values[i][j] = mat->values[i][j] * lambda;
+#else
+    register int i, size;
+    register real *result, *val;
+
+    /* we know all rows were allocated contiguously starting
+     * at mat->values[1] hence we may save on pointer indirections */
+    size = mat->rows * mat->cols;
+    result = scprod->values[1];
+    val = mat->values[1];
+    for (i = 1; i <= size; i++)
+	result[i] = val[i] * lambda;
+
+#endif
+}
+
+
+/** @@} */
+
+/*----------------------------------------------------------------*/
+/*  	    	    	MATRIX PROPERTIES   	    	    	  */
+/*----------------------------------------------------------------*/
+
+/** \defgroup matrix_properties
+ * @@{
+ */
+
+/**
+ *  \brief query if a matrix is square
+ *
+ *  Verify if both dimensions of a matrix are the same (i.e. it is square)
+ *
+ *  \param mat the matrix to verify
+ *
+ *  \return TRUE if the matrix is square, false otherwise
+ */
+public boolean mat_is_square(matrix mat)
+{
+    return (mat->rows == mat->cols);
+}
+
+/**
+ * \brief check if a matrix is symmetric 
+ *
+ * Check if a matrix is symmetric. A symmetric matric has all its
+ * elements symmetric with respect to the main diagonal (a<sub>ij</sub>
+ * = a<sub>ji</sub>): A=A'
+ *
+ * This is useful for handling quadratic forms: Given A<sub>mn</sub>
+ * and X<sub>n1</sub> then \f[
+     X^T A X = \sum_{i=1}^n \sum{j=1}^n a_{ij} x{i} x{j}
+ \f]
+ * and conversely, given a quadratic form, it may be converted to matrix
+ * form, but there are many ways to choose a matrix A. One of them is to
+ * select A a symmetric matrix: it is then easier to select its values.
+ *
+ * \param mat the matrix to verify
+ *
+ * \return TRUE if the matrix is symmetric, FALSE otherwise.
+ */
+public boolean mat_is_symmetric(matrix mat)
+{
+#ifndef MAT_OPTIMIZE
+    boolean symmetric = TRUE;
+    int i, j;
+    
+    if (mat->rows != mat->cols)
+    	/* the matrix must be square to start with */
+    	return FALSE;
+
+    for (i = 1; i <= mat->rows - 1; i++)
+	for (j = i + 1; j <= mat->cols; j++)
+	    if (mat->values[i][j] != mat->values[j][i])
+    	    	return FALSE;
+#else
+    /* trivial optimizations */
+    boolean symmetric = TRUE;
+    int i, j, dim;
+    real **element;
+    
+    if ((dim = mat->rows) != mat->cols)
+    	return FALSE;
+
+    element = mat->values;
+    for (i = 1; i <= dim; i++)
+    	for (j = 1; j <= dim; j++)
+	    if (element[i][j] != element[j][i])
+	    	return FALSE;
+#endif
+}
+
+/**
+ * \brief query if this is an identity matrix
+ *
+ *  Return if the matrix is an identity matrix. The matrix must be a
+ * square matrix and have all elements in the main diagonal set to 
+ * one, and all off-diagonal elements set to zero.
+ *
+ * An identity matrix of order n, I<sub>nn</sub> verifies
+ * 
+ * A<sub>mn</sub> I<sub>nn</sub> = A<sub>mn</sub>
+ *
+ * I<sub>nn</sub> B<sub>np</sub> = B<sub>np</sub>
+ *
+ * \param mat the matrix to verify
+ * 
+ * \return TRUE if the matrix is an identity matrix.
+ */
+public boolean mat_is_identity(matrix mat)
+{
+    int i, j, dim;
+    
+    if ((dim = mat->rows) != mat->cols)
+    	return FALSE;
+    
+    for (i = 1; i <= dim; i++)
+    	for (j = 1; j <= dim; j++)
+	    if (i == j) {
+	    	if (mat->values[i][i] != 1.0)
+		    return FALSE;
+	    }
+	    else
+	    	if (mat->values[i][j] != 0.0)
+		    return FALSE;
+    return TRUE;
+}
+
+/**
+ * \brief query if a matrix is null
+ *
+ * Find out if we are dealing with the null matrix. A null matrix has
+ * all of its elements set to zero.
+ *
+ * \param mat the matrix to verify
+ * 
+ * \return TRUE if the matrix is a null matrix.
+ */
+public boolean mat_is_null(matrix mat) {
+#   ifndef MAT_OPTIMIZE
+    int i, j;
+    
+    for (i = 1; i <= mat->rows; i++)
+    	for (j = 1; j <= mat->cols; j++)
+	    if (mat->values[i][j] != 0.0)
+	    	return FALSE;
+#   else
+    int i, size;
+    real *elem;
+    
+    size = mat->rows * mat->cols;
+    elem = mat->values[i];
+    for (i = 1; i <= size; i++)
+    	if (elem[i] != 0.0)
+	    return FALSE;
+#   endif
+    return TRUE;
+}
+
+/** @@} */
+
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*							*
+*		END OF MODULE MATRIX.C			*
+*		    (T'was time!)			*
+*							*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*/
+@
