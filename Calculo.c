@@ -1,0 +1,1197 @@
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*								    *
+*	MODULO CALCULO1.C					    *
+*								    *
+*	Módulo con funciones de cálculo numérico de diversa	    *
+*   índole.							    *
+*								    *
+*	CONTIENE:						    *
+*	    real Tchebyshev(n, x)				    *
+*	Interpolación:						    *
+*	    int IpLineal(x, y, np, xint, yint, npi)		    *
+*	    int IpLagrange(x, y, np, xint, yint, npi)		    *
+*	Integración:						    *
+*	    real IgTrapecio(f, xinf, xsup, ni)			    *
+*	    real IgSimpson(f, xinf, xsup, ni)			    *
+*	Solución de una Ecuación:				    *
+*	    int EcAproxSuc(sol, f, x, cerr, nmi)		    *
+*	    int EcNewton_Raphson(sol, func, derivf, x0, cerr, nmi)  *
+*	    int EcAprNewtonRpahson(sol, func, x0, cerr, nmi)	    *
+*	    int EcRegulaFalsi(sol, f, a, b, cerr, nmi)		    *
+*	    int EcSecante(sol, f, a, b, cerr, nmi)		    *
+*	    int EcBiparticion(sol, f, a, b, cerr, nmi)		    *
+*	Sistemas de ecuaciones:					    *
+*	    int SEcGauss(n, a, x)				    *
+*	    int SEc_Gauss(n, sistema)				    *
+*	    int SEcGauss_Jordan(n, a, x)			    *
+*	    int SEcCholesky(n, a, b, x)				    *
+*	    int SEcJacobi(n, a, x, cerr, nmi)			    *
+*	    int SEcGauss_Seidel(n, eqns, solns, precis, nmi)	    *
+*	    int SEcGaussSeidel(n, a, x, cerr, nmi)		    *
+*	Autovalores y autovectores:				    *
+*	    void AVLeverrierFaddev(n, a, p)			    *
+*	    int AVAproxSuc(n, a, x, avmax, cerr, nmi)		    *
+*								    *
+*	DISEÑADO POR:						    *
+*	    José Ramón Valverde Carrillo.			    *
+*								    *
+*	ULTIMA MODIFICACION:					    *
+*	    14 - dic - 1988	(implementación en IBM PC-AT)	    *
+*	    16 - dic - 1988	(transporte a Mac)		    *
+*								    *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*/
+
+#include <stdio.h>
+#include <math.h>
+
+#include "portable.h"
+
+typedef double real;	    /* para poder controlar la precisión */
+
+typedef unsigned iter_no;
+
+typedef unsigned Sis_ord;
+
+typedef unsigned counter;
+
+typedef real *matriz;
+
+typedef real *vector;
+
+#define odd(x)		((x) & 1)
+	/* pone todos los bits a cero menos el último. Si es par será
+	0 y devolverá FALSE, si no lo es será 1 y resultará TRUE */
+
+#define even(x)		(! odd(x))
+
+private bool fsign(x)
+real x;
+  {
+    if (x > 0.0)
+      return 1;
+    else
+      if (x < 0.0)
+        return -1;
+      else
+        return 0;
+  }
+
+real Tchebyshev(n, x)
+unsigned int n;
+real x;
+/* Polinomio de Tchebyshev de grado n */
+  {
+    register unsigned int i;
+    real t0, t1, t2;
+    
+    t0 = 1.0;
+    t1 = x;
+    for (i = 2; i <= n; i++)
+      {
+        t2 = 2.0 * x * t1 - t0;
+        t0 = t1;
+        t1 = t2;
+      }
+    return ((n == 0)? 1.0: t1);
+  }
+
+/*------------------------------*
+|				|
+|	INTERPOLACION		|
+|				|
+*-------------------------------*/
+
+/* interpolación lineal */
+
+public status IpLineal(x, y, np, xint, yint, npi)
+/* Entrada */
+real *x;	    /* array ordendado de valores x */
+real *y;	    /* array de valores y	    */
+int np;		    /* número de puntos		    */
+real *xint;	    /* array con los valores x a interpolar */
+/* Salida */
+real *yint;	    /* array con los valores y interpolados */
+int npi;	    /* número de puntos a interpolar */
+  {
+    int i, count, error;
+    
+    error = 0;
+    for (count = 0; count < npi; count++)
+      {
+        if ((xint[count] < x[0]) || (xint[count] > x[np - 1]))
+          {	    /* no se calcula el punto */
+            error --;
+            yint[count] = 0.0;	/* anulamos el valor */
+          }
+        else
+          {
+            i = 1;
+            while (xint[count] > x[i]) i++;
+            yint[count] = (x[i] - xint[count]) * y[i - 1];
+            yint[count] += (xint[count] - x[i - 1]) * y[i];
+            yint[count] /= x[i] - x[i - 1];
+          }
+      }
+    return error;   /* error = 0 => SUCCESS; error < 0 ==> FAIL */
+  }
+
+/* Interpolación polinomial o de Lagrange */
+
+public status IpLagrange(x, y, np, xint, yint, npi)
+real *x;	    /* array ordenado de valores x  */
+real *y;	    /* array de valores y	    */
+int np;		    /* número de puntos		    */
+real *xint;	    /* array con los valores x a interpolar */
+real *yint;	    /* array con los valores y interpolados */
+int npi;	    /* número de puntos a interpolar */
+  {
+    int i, j, count, error;
+    real c, d;
+    
+    error = 0;
+    for (count = 0; count < npi; count++)
+      {
+        if ((xint[count] < x[0]) || (xint[count] > x[np - 1]))
+          {
+            error--;
+            yint[count] = 0.0;
+          }
+        else
+          {
+            for (i = 0; i < np; i++)
+              {
+                c = 1.0;
+                for (j = 0; j < np; j++)
+                  if (j != i)
+                    {
+                      d = (xint[count] - x[j]) / (x[i] - x[j]);
+                      c *= d;
+                    }
+                yint[count] += c * y[i];
+              }
+          }
+      }
+    return error;
+  }
+
+/*--------------------------*
+|			    |
+|	INTEGRACION	    |
+|			    |
+*---------------------------*/
+
+/* integración por el método del trapecio */
+
+public real IgTrapecio(f, xinf, xsup, ni)
+real (*f)();	    /* función a integrar */
+real xinf, xsup;    /* extremos inferior y superior del intervalo de
+		    integración */
+int ni;		    /* número de subintervalos de integración */
+  {
+    real y1,	    /* valor de y sub i */
+         y2,	    /* valor de y sub i + 1 */
+         sum,	    /* valor del sumatorio */
+         h,	    /* intervalo */
+         x;	    /* valor a calcular */
+    unsigned int i;
+    
+    y1 = (*f)(xinf);
+    h = (xsup - xinf) / ni;
+    sum = 0.0;
+    x = xinf;
+    for (i = 1; i <= ni; i++)
+      {
+        x += h;
+        y2 = (*f)(x);
+        sum += h * (y1 + y2) / 2.0;
+        y1 = y2;
+      }
+    return sum;
+  }
+
+/* integracióón por el método de Simpson */
+
+public real IgSimpson(f, xinf, xsup, ni)
+real (*f)();	    /* función a integrar */
+real xinf, xsup;    /* extremos inferior y superior del intervalo de
+		    integración */
+int ni;		    /* número de subintervalos de integración */
+  {
+    unsigned int i, nt;
+    real x, y, h, sum;
+    
+    x = xinf;
+    if (odd(ni))
+      /* número de tramos incorrecto, ni debe ser par */
+      nt = ni + 1;
+    else
+      nt = ni;
+    
+    /* Proceso */
+    sum = (*f)(x);
+    h = (xsup - xinf) / nt;
+    for (i = 2; i <= nt; i++)
+      {
+        x += h;
+        y = (*f)(x);
+        sum += (odd(i))? (4.0 * y) : (2.0 * y);
+      }
+    sum += (*f)(x + h) * h / 3.0;
+    
+    return sum;
+  }
+
+/*--------------------------------------*
+|					|
+|	RESOLUCION DE UNA ECUACION	|
+|					|
+*---------------------------------------*/
+
+/* resolución de una ecuacióón por el método de las aproximaciones
+sucesivas							*/
+
+public status EcAproxSuc(sol, f, x, cerr, nmi)
+real *sol;	    /* Solución */
+real (*f)();	    /* Ecuación a resolver */
+real x;		    /* Valor inicial */
+iter_no nmi;	/* Número máximo de iteraciones */
+real cerr;	    /* Cota de error admisible */
+  {
+    real x1,	    /* valor de x en la iteración i */
+         x2,	    /* valor de x en la iteración i + 1 */
+         erit;	    /* error relativo en cada iteración */
+    iter_no ni;	/* número de iteraciones */
+    
+    ni = 0;
+    x1 = x;
+    do
+      {
+        x2 = (*f)(x1);
+        erit = fabs((x2 - x1) * 100.0 / x2);
+        x1 = x2;
+        ni++;
+      }
+    while ((erit > cerr) && (ni < nmi));
+    *sol = x2;
+    return (ni >= nmi)? FAIL : SUCCESS;
+  }
+
+/* resolución de una ecuación por el método de Newton - Raphson */
+
+public status EcNewton_Raphson(sol, func, derivf, x0, cerr, nmi)
+real *sol;	    /* solución */
+real (*func)(), (*derivf)();	/* ecuación y su derivada */
+real x0;	    /* valor inicial */
+iter_no nmi;	/* número máximo de iteraciones */
+real cerr;	    /* cota de error admisible */
+  {
+    iter_no ni;	/* no. de iteraciones */
+    real x,		/* valor de x en la iteración i */
+         x_1,		/* valor de x en la iteración i - 1 */
+         erit;		/* error relativo en cada iteración */
+    
+    x_1 = x0;
+    ni = 0;
+    do
+      {
+        x = x_1 - (*func)(x_1) / (*derivf)(x_1);
+        erit = fabs((x - x_1) * 100.0 / x);
+        x_1 = x;
+        ni++;
+      }
+    while ((erit > cerr) && (ni < nmi));
+    *sol = x;
+    return (ni >= nmi)? FAIL : SUCCESS;
+  }
+
+/* Newton - Rpahson 2:
+    Se puede sustituir el cálculo de la derivada de f, f'(xi-1) por
+    
+	f'(xi-1) aprox= (f(xi-1) - f(xi-2)) / (xi-1 - xi-2)
+	
+    con lo que
+    
+	xi = xi-1 - (((xi-1 - xi-2) / (f(xi-1) - f(xi-2)) . f(xi-1))
+*/
+
+public status EcAprNewtonRaphson(sol, func, x0, cerr, nmi)
+real *sol;	    /* solucióón */
+real (*func)();	    /* ecuación */
+real x0;	    /* valor inicial */
+iter_no nmi;	/* número máximo de iteraciones */
+real cerr;	    /* cota de error admisible */
+  {
+    iter_no ni;	    /* no. de iteraciones */
+    real x,	    /* valor de x en la iteración i */
+    	 x_1,	    /* valor de x en la iteración i - 1 */
+    	 x_2,	    /* valor de x en la iteración i - 2 */
+    	 fx_1,	    /* valor de f(x_1) */
+    	 fx_2,	    /* valor de f(x_2) */
+    	 erit;	    /* error relativo en cada iteración */
+    
+    x_2 = x0;
+    x_1 = fx_2 = (*func)(x_2);
+    ni = 0;
+    do
+      {
+        fx_1 = (*func)(x_1);
+        x = x_1 - ((x_1 - x_2) / (fx_1 - fx_2)) * fx_1;
+        erit = fabs((x - x_1) * 100.0 / x);
+        x_2 = x_1;
+        x_1 = x;
+        fx_2 = fx_1;
+        ni++;
+      }
+    while ((erit > cerr) && (ni < nmi));
+    *sol = x;
+    return (ni >= nmi)? FAIL : SUCCESS;
+  }
+
+/* resolución de una ecuación por el método de la Regula Falsi
+
+    Sea f una ecuación supuesta contínua en el intervalo [a, b]
+    y con una sola raíz f(x) = 0 en [a, b] => f(a) * f(b) < 0.
+    Partiendo de {a, f(a)} y {b, f(b)}
+	x0 = b - (((b - a) f(b)) / (f(b) - f(a)))
+    Se comprueba si f(x0) . f(a) < 0
+    Si es así se tiene b = x0 y se repite el cálculo, sino a = x0
+    
+    La convergencia es más lenta que con Newton - Raphson, pero no
+    requiere calcular la derivada de f.
+*/
+
+public status EcRegulaFalsi(sol, f, a, b, cerr, nmi)
+real *sol;
+real (*f)();
+real a, b, cerr;
+iter_no nmi;
+  {
+    real inf, sup, oldmed, med, finf, fsup, fmed, erit;
+    iter_no ni;
+    
+    if (fsign((*f)(a)) == fsign((*f)(b)))
+      return FAIL;
+      /* si no, es que tiene no solución o más de una */
+    
+    ni = 0;
+    inf = a;
+    sup = b;
+    oldmed = a;
+    do
+      {
+        finf = (*f)(inf);
+        fsup = (*f)(sup);
+        med = sup - (((sup - inf) * fsup) / (fsup - finf));
+        fmed = (*f)(med);
+        erit = fabs((med - oldmed) * 100.0 / med);
+        oldmed = med;
+        if ((fmed > 0.0) && (finf < 0.0))
+          sup = med;
+        else
+          inf = med;
+        ni++;
+      }
+    while ((erit > cerr) && (ni < nmi));
+    *sol = med;
+    return (ni >= nmi)? FAIL : SUCCESS;
+  }
+
+/* Solución de una ecuación por el método de la secante */
+
+public status EcSecante(sol, f, a, b, cerr, nmi)
+real *sol;
+real (*f)();
+real a, b, cerr;
+iter_no nmi;
+  {
+    real xn_1,	    /* x(n - 1) */
+    	 xn,	    /* x(n) */
+    	 xn1,	    /* x(n + 1) */
+    	 fxn_1, fxn, erit;
+    iter_no ni;
+    
+    if (fsign((*f)(a)) == fsign((*f)(b)))
+      return FAIL;
+    
+    ni = 0;
+    xn_1 = a;
+    xn = b;
+    do
+      {
+        fxn = (*f)(xn);
+        fxn_1 = (*f)(xn_1);
+        xn1 = ((fxn * xn_1) - (fxn_1 * xn)) / (fxn - fxn_1);
+        erit = fabs((xn1 - xn) * 100.0 / xn1);
+        xn_1 = xn;
+        xn = xn1;
+        ni++;
+      }
+    while ((erit > cerr) && (ni < nmi));
+    *sol = xn1;
+    return (ni >= nmi)? FAIL : SUCCESS;
+  }
+
+/* Solución de una ecuación por el método de la bipartición.
+    Si f(x) es tal que es monótona y contínua en [a, b] y que
+    f(a) y f(b) poseen signos distintos entonces existe una
+    solución única x* en [a, b].
+*/
+
+public status EcBiparticion(sol, f, a, b, cerr, nmi)
+real *sol;
+real (*f)();
+real a, b, cerr;
+iter_no nmi;
+  {
+    real inf, sup, med, old,
+    	 finf, fmed, erit;
+    iter_no ni;
+    
+    if (fsign((*f)(a)) == fsign((*f)(b)))
+      return FAIL;
+    ni = 0;
+    inf = a;
+    sup = b;
+    old = a;
+    do
+      {
+        med = (inf + sup) / 2.0;
+        finf = (*f)(inf);
+        fmed = (*f)(med);
+        erit = fabs((med - old) * 100.0 / med);
+        if (fsign(finf) == fsign(fmed))
+          old = inf = med;
+        else
+          old = sup = med;
+        ni++;
+      }
+    while ((erit > cerr) && (ni < nmi));
+    *sol = med;
+    return (ni >= nmi)? FAIL : SUCCESS;
+  }
+
+/*--------------------------------------------------*
+|						    |
+|	RESOLUCION DE SISTEMAS DE ECUACIONES	    |
+|						    |
+*---------------------------------------------------*/
+
+/* Resolución de sistemas de ecuaciones por el método de Gauss */
+
+public status SEcGauss(n, a, x)
+Sis_ord n;	/* orden del sistema */
+matriz a;	/* matríz ampliada de coeficientes */
+vector x;	/* vector de incógnitas */
+  {
+    counter up, i, j, k;
+    real maxi, tmp;
+    
+    /* Módulo de triangulación */
+    
+    /* Búsqueda de la fila pivote */
+    for (i = 0; i < (n - 1); i++)
+      {
+        maxi = 0.0;
+        for (j = 0; j < n; j++)
+          {
+            tmp = fabs(a[j * n + i]);
+            if (tmp > maxi)
+              {
+                maxi = tmp;
+                up = j;
+              }
+          }
+        /* Prueba de matríz singular */
+        if (maxi == 0.0)
+          return FAIL;
+        /* intercambio de filas */
+        for (j = 0; j <= n; j++)
+          {
+            maxi = a[up * n + j];
+            a[up * n + j] = a[i * n + j];
+            a[i * n + j] = maxi;
+          }
+        for (j = i + 1; j < n; j++)
+          for (k = i + 1; k < (n + 1); k++)
+            a[j * n + k] -= a[i * n + k] * a[j * n  + i] / a[i * n + i];
+      }
+    
+    /* Módulo de resolución / sustitución hacia atrás */
+    
+    for (i = n - 1; i >= 0; i--)
+      {
+        maxi = 0.0;
+        if (i != n)
+          for (j = 0; j < n; j++)
+            maxi += a[i * n + j] * x[j];
+        x[i] = (a[(i * n) + (n + 1)] - maxi) / a[i * n + i];
+      }
+
+    return SUCCESS;
+  }
+
+public SEc_Gauss(n, sistema)
+Sis_ord n;
+matriz sistema;		/* sistema[n, n + 1] */
+/*
+Dado n, el no. de ecuaciones del sistema, y el sistema, un matríz
+ampliada de la forma
+	| a11, a12, ... , a1n | b1 |
+	| a21, a22, ... , a2n | b2 |
+	| ...  ...  ...   ... | .. |
+	| an1, an2, ... , ann | bn |
+éste procedimiento halla la matríz solución correspondiente
+	|  1 ,  0 , ... ,  0  | x1 |
+	|  0 ,  1 , ... ,  0  | x2 |
+	| ...  ...  ...   ... | .. |
+	|  0,   0 , ... ,  0  | xn |
+donde ax = b		(dim(a) = n * (n + 1))
+*/
+  {
+    real pivot;	    /* elemento pivote de una fila */
+    counter m,	    /* número de columnas = n + 1  */
+        i, j, k;    /* contadores de iteración y subíndices */
+        
+    /* Eliminación Gaussiana */
+    /*	    Eliminación hacia delante */
+    m = n + 1;
+    for (i = 0; i < n; i++)
+      {
+        /* divide cada elemento de la fila por el pivote */
+        pivot = sistema[i * n + i];
+        for (j = 0; j < m; j++)
+          sistema[i * n + j] /= pivot;
+        
+        /* resta un múltiplo de la fila a cada fila por el pivote */
+        for (j = i + 1; j < n; j++)
+          {
+            pivot = sistema[j * n + i];
+            for (k = 0; k < m; k++)
+              sistema[j * n + k] -= pivot * sistema[i * n + k];
+            sistema[j * n + i] = 0.0;
+          }
+      }
+    
+    /* Sustitución retroactiva */
+    for (i = n - 1; i > 0; i--)
+      {
+        for (j = 0; j < (i - 1); j++)
+          {
+            sistema[j * n + m] -= sistema[j * n + i] * sistema[i * n + m];
+            sistema[j * n + i] = 0.0;
+          }
+      }
+  }
+
+public status SEcGauss_Jordan(n, a, x)
+Sis_ord n;  /* orden del sistema */
+matriz a;   /* matríz ampliada de vectores de coeficientes */
+vector x;   /* vector de incógnitas */
+  {
+    flag *ind;	/* vector de indicadores de uso de la fila como pivote
+    		ind[i] = 1 ==> la fila i ha sido usada
+    		ind[i] = 0 ==>Êla fila i no ha sido usada	    */
+    int *ord;	/* vector que conserva el orden de empleo de la fila i
+    		como pivote					    */
+    real temp;	/* variable temporal */
+    counter np,	/* número de la fila pivote */
+    	i, j, k;    /* variables de control de bucles */
+    
+    /* reservamos espacio para los vectores auxiliares */
+    ind = (flag *) calloc(n, sizeof(flag));
+    ord = (int *) calloc(n, sizeof(int));
+    
+    /* inicialización */
+    for (i = 0; i < n; i++)
+      {
+        ind[i] = 0;
+        ord[i] = 0;
+      }
+    
+    /* Módulo de diagonalización */
+    /* Búsqueda de la fila pivote */
+    for (i = 0; i < n; i++)
+      {
+        temp = 0.0;
+        for (j = 0; j < n; j++)
+          if (ind[j] != 1)
+            if (fabs(a[j * n + i]) > fabs(temp))
+              {
+                temp = a[j * n + i];
+                np = j;
+              }
+        
+        /* prueba matríz singular */
+        if (temp = 0.0)
+          {
+            free(ind);
+            free(ord);
+            return FAIL;
+          }
+        ind[np] = 1;
+        ord[i] = np;
+        for (j = 0; j < n; j++)
+          if (j != np)
+            for (k = i + 1; k < (n + 1); k++)
+              a[j * n + k] -= a[np * n + k] * a[j * n + i] / temp;
+      }
+    
+    /* Módulo de resolución */
+    for (i = 0; i < n; i++)
+      {
+        np = ord[i];
+        x[i] = a[(np * n) + (np + 1)] / a[np * n + i];
+      }
+    
+    free(ind);
+    free(ord);
+    return SUCCESS;
+  }
+
+/* resolución de ecuaciones por el método de Cholesky */
+
+public SEcCholesky(n, a, b, x)
+Sis_ord n;  /* orden del sistema */
+matriz a;   /* matríz de coeficientes de orden n x n */
+vector b;   /* vector de términos independientes */
+vector x;   /* vector de incógnitas */
+  {
+    real sum;	/* variable auxiliar (sumatorios) */
+    real temp;	/* variable temporal */
+    counter i, j, k;
+    
+    /* inicialización */
+    for (i = 0; i < n; i++)
+      x[i] = 0.0;
+    sum = temp = 0.0;
+    
+    /* módulo de descomposición */
+    for (i = 0; i < n; i++)
+      for (j = 0; j < n; j++)
+        {
+          sum = a[i * n + j];
+          for (k = 0; k < (i - 1); k++)
+            sum -= a[k * n + i] * a[k * n + j];
+          if (i != j)
+            a[i * n + j] + sum * temp;
+          else
+            {
+              temp = 1 / sqrt(sum);
+              a[i * n + j] = temp;
+            }
+        }
+      
+    /* Módulo de resolución. Obtención de x* */
+    for (i = 0; i < n; i++)
+      {
+        sum = b[i];
+        for (k = 0; k < (i - 1); k++)
+          sum -= a[k * n + i] * x[k];
+        x[i] = sum * a[i * n + i];
+      }
+    
+    /* Módulo de resolución. Obtención de x */
+    for (i = n - 1; i >= 0; i--)
+      {
+        sum = x[i];
+        for (k = i + 1; k < n; k++)
+          sum -= a[i * n + k] * x[k];
+        x[i] = sum * a[i * n + i];
+      }
+  }
+
+/* Resolución de sistemas de ecuaciones por el método iterativo de Jacobi */
+
+public status SEcJacobi(n, a, x, cerr, nmi)
+Sis_ord n;	/* orden del sistema */
+matriz a;	/* matríz ampliada del sistema */
+vector x;	/* solución. Iteración k del vector de incógnitas */
+real cerr;	/* cota de error admisible */
+iter_no nmi;	/* número máximo de iteraciones */
+  {
+    vector y;	    /* iteración k + 1 del vector de incógnitas */
+    real temp,	    /* variable temporal */
+    	 sum;	    /* sumatorio del algoritmo */
+    iter_no iter;   /* contador de iteraciones */
+    counter i, j;   /* índices y contadores de bucles */
+    flag erit;	    /* indicador de error en la iteración */
+    
+    y = (vector) calloc(n, sizeof(real));
+    
+    /* módulo de iteración */
+    iter = 0;
+    for (;;)
+      {
+        iter++;
+        erit = FALSE;
+        for (i = 0; i < n; i++)
+          {
+            y[i] = a[(i * n) + n + 1];
+            for (j = 1; j < n; j++)
+              if (j != i)
+                y[i] -= a[i * n + j] * x[j];
+            y[i] /= a[i * n + i];
+            if (fabs(y[i] - x[i]) > cerr)
+              erit = TRUE;
+          }
+        if (erit == FALSE)
+          break;
+        else
+          if (iter == nmi)
+            {
+              free(y);
+              return FAIL;
+            }
+          else
+            {
+              for (i = 0; i < n; i++)
+                x[i] = y[i];
+            }
+      }
+    free(y);
+    return SUCCESS;
+  }
+
+public status SEcGauss_Seidel(n, eqns, solns, precis, nmi)
+Sis_ord n;
+matriz eqns;
+vector solns;
+iter_no nmi;
+/*
+  Dados los parámetros n, eqns, solns, precis según se describe
+  	n - no. de ecuaciones
+  	eqns - matríz de ecuaciones de tamaño n x n
+  	solns - vector solución de tamaño n
+  	precis - precisión deseada del resultado
+  	nmi - no. máximo de iteraciones 
+  éste procedimiento resuelve el conjunto de ecuaciones
+  lineales simultáneas por medio de la iteración de Gauss - Seidel.
+    Otras variables usadas son:
+  	sum - la suma de los cuadrados de las diferencias
+  	old - una aproximación previa
+  	done - indicativo de convergencia de las iteraciones
+  	i, j, k - índices y contadores de iteració
+*/
+  {
+    real sum, old;
+    counter i, j, k;
+    bool done;
+    
+    /* iteración de Gauss - Seidel */
+    done = FALSE;
+    i = 1;
+    /* realización de las iteraciones hasta un máximo de nmi */
+    while ((!done) && (i <= nmi))
+      {
+        /* calcula un nuevo conjunto de aprox. */
+        sum = 0.0;
+        for (j = 0; j < n; j++)
+          {
+            old = solns[j];
+            solns[j] = eqns[j * n + 0];
+            for (k = 1; k < n; k++)
+              {
+                if (k != j)
+                  solns[j] += eqns[j * n + k] * solns[k - 1];
+                else
+                  solns[j] += eqns[j * n + k] * solns[k];
+              }
+            sum += (solns[j] - old) * (solns[j] - old);
+          }
+        
+        /* comprueba precisión */
+        if (sum < precis)
+          done = TRUE;
+        else
+          i++;
+      }
+    
+    /* converge ? */
+    if (done)
+      return SUCCESS;
+    else
+      return FAIL;
+  }
+
+public status SEcGaussSeidel(n, a, x, cerr, nmi)
+Sis_ord n;	    /* orden del sistema */
+matriz a;	    /* matríz ampliada de coeficientes */
+vector x;	    /* vector de incógnitas */
+real cerr;	    /* cota de error admisible */
+iter_no nmi;	    /* número máximo de iteraciones */
+  {
+    real temp,	    /* variable temporal */
+    	 sum;	    /* sumatorio del algoritmo */
+    bool erit;	    /* indicador de error */
+    iter_no iter;   /* contador de iteraciones */
+    counter i, j;
+    
+    /* obtención de la solución inicial */
+    for (i = 0; i < n; i++)
+      x[i] = a[(i * n) + n + 1] / a[i * n + i];
+    
+    /* módulo de iteración */
+    iter = 0;
+    do
+      {
+        erit = TRUE;
+        for (i = 0; i < n; i++)
+          {
+            sum = 0.0;
+            for (j = 0; j < n; j++)
+              if (j != i)
+                sum += a[i * n + j] * x[j];
+            temp = (a[(i * n) + n + 1] - sum) / a[i * n + i];
+            if ((fabs(temp) - x[i]) > cerr)
+              erit = FALSE;
+            x[i] = temp;
+          }
+        if (erit == FALSE)
+          break;
+        else
+          iter++;
+      }
+    while (iter <= nmi);
+    
+    if (erit == TRUE)
+      return FAIL;
+    else
+      return SUCCESS;
+  }
+
+/*--------------------------------------------------*
+|						    |
+|	CALCULO DE AUTOVALORES Y AUTOVECTORES	    |
+|						    |
+*---------------------------------------------------*/
+
+/*
+	Método de Leverrier - Faddev
+    para la obtención de los coeficientes del
+    polinomio característico.
+*/
+
+public void AVLeverrierFaddev(n, a, p)
+Sis_ord n;	/* orden del sistema */
+matriz a;	/* matríz dato */
+vector p;	/* vector que almacena los coeficientes */
+  {
+    matriz b;	/* matríz = ([A] - tr([A]) [I]) [A] */
+    vector c;	/* vector empleado en el producto [A] x [B] */
+    counter i, j, k, l;
+    
+    b = (matriz) calloc(n * n, sizeof(real));
+    c = (vector) calloc(n, sizeof(real));
+    
+    /* Proceso */
+    j = n * n;
+    for (i = 0; i < j; i++)
+      b[i] = a[i];
+    for (i = 0; i < n; i++)
+      {
+        for (j = 0; j < n; j++)
+          p[i] += b[j * n + j];
+        p[i] /= i;
+        
+        /* p[i] resultante */
+        for (j = 0; j < n; j++)
+          b[j * n + j] -= p[i];
+        for (j = 0; j < n; j++)
+          {
+            for (k = 0; k < n; k++)
+              {
+                c[k] = b[k * n + j];
+                b[k * n + j] = 0.0;
+              }
+            for (k = 0; k < n; k++)
+              for (l = 0; l < n; l++)
+                b[k * n + j] += a[k * n + l] * c[l];
+          }
+      }
+    free(b);
+    free(c);
+  }
+
+public status AVAproxSuc(n, a, x, avmax, cerr, nmi)
+Sis_ord n;	/* orden del sistema */
+matriz a;	/* matríz dato */
+vector x;	/* autovector. DEBE CONTENER UN VALOR INICIAL */
+real *avmax;	/* autovalor máximo */
+real cerr;	/* cota de error admisible */
+iter_no nmi;	/* número máximo de iteraciones */
+  {
+    counter i, j;
+    iter_no iter;   /* contador de iteraciones */
+    vector c;	    /* vector producto de a . x */
+    real temp,	    /* variable temporal */
+    	 maxi;	    /* valor máximo de c en cada iteración */
+    
+    c = (vector) calloc(n, sizeof(real));
+    
+    iter = 0;
+    maxi = *avmax;
+    do
+      {
+        iter++;
+        for (i = 0; i < n; i++)
+          for (j = 0; j < n; j++)
+            c[i] += a[i * n + j] * x[j];
+        temp = maxi;
+        maxi = 0.0;
+        for (i = 0; i < n; i++)
+          if (fabs(c[i]) > fabs(maxi))
+            maxi = c[i];
+        for (i = 0; i < n; i++)
+          {
+            x[i] = c[i] / maxi;
+            c[i] = 0.0;
+          }
+      }
+    while ((fabs(temp - maxi) > cerr) && (iter != nmi));
+    
+    *avmax = maxi;
+    free(c);
+    return (iter == nmi)? FAIL : SUCCESS;
+  }
+
+/*----------------------------------------------*
+|						|
+|	ECUACIONES DIFERENCIALES ORDINARIAS	|
+|						|
+*-----------------------------------------------*/
+
+/*
+    Método de Euler para la resolución aproximada
+    de ecuaciones diferenciales ordinarias.
+*/
+
+public void EDOEuler(x0, y0, uvx, np, vals, func)
+real x0;	/* valor inicialde x */
+real y0;	/* valor inicial de y */
+real uvx;   /* último valor de x */
+int np;	    /* número de puntos */
+real *vals; /* valores (0..np) calculados de y */
+real (*func)();	    /* función a integrar */
+  {
+    real inter;	    /* intervalo */
+    real x, y;
+    int i;
+    
+    x = x0;
+    y = y0;
+    inter = (uvx - x) /np;
+    vals[0] = y0;
+    for (i = 1; i < np; i++)
+      {
+        y += inter * (*func)(x, y);
+        x += inter;
+        vals[i] = y;
+      }
+  }
+
+public void EDOEuler_Gauss(x, uvx, y, np, cerr, nmc, vals, func)
+real x;		/* valor inicial de x */
+real uvx;	/* último valor de x */
+real y;		/* valor inicial de y */
+int np;		/* número de puntos */
+real cerr;	/* cota de error */
+int nmc;	/* número máximo de correcciones */
+real *vals;	/* conjunto de valores de y calculados */
+real (*func)();
+  {
+    real x1,	/* valor de x en el punto i en cada iteración */
+    	 x2,	/* valor de x en el punto i + 1 ... */
+    	 y1,	/* valor de y en el punto y en cada iteración */
+    	 yp2,	/* valor predictor de y en cada iteración */
+    	 yc2,	/* valor corrector de y en cada iteración */
+    	 inter,	/* intervalo*/
+    	 erit,	/* error relativo de la iteración */
+    	 f1, f2;
+    int nc,	/* número de correcciones por iteración */
+    	i;	/* contador de bucles */
+    
+    x1 = x;
+    y1 = y;
+    inter = (uvx - x1);
+    vals[0] = y1;
+    for (i = 1; i < np; i++)
+      {
+        x2 = x1 + inter;
+        yp2 = y1 + inter * (*func)(x1, y1);
+        nc = 0;
+        do
+          {
+            f1 = (*func)(x1, y1);
+            f2 = (*func)(x2, yp2);
+            yc2 = y1 + inter * (f1 + f2) / 2.0;
+            nc++;
+            yp2 = yc2;
+          }
+        while (nc < nmc);
+        vals[i] = yp2;
+        x1 = x2;
+        y1 = yp2;
+      }
+  }
+
+/*
+    Método de Runge - Kutta
+*/
+
+public void EDORunge_Kutta(x, y, uvx, np, vals, func)
+real x,		    /* Valor de x en cada iteración */
+     y,		    /* Valor de y en cada iteración */
+     uvx;	    /* Ultimo valor de x */
+int np;		    /* No. de puntos */
+real vals[];	    /* Matríz con los valores de y obtenidos */
+real (*func)();	    /* Función a integrar */
+  {
+    real inter,		    /* intervalo */
+	 t1, t2, t3, t4;    /* variables temporales */
+    counter i;			/* contador del bucle */
+    
+    inter = (uvx - x) / np;
+    vals[0] = y;
+    for (i = 1; i < np; i++)
+      {
+        t1 = (*func)(x, y);
+        t2 = (*func)(x + inter / 2, y + inter * t1 / 2);
+        t3 = (*func)(x + inter / 2, y + inter * t2 / 2);
+        t4 = (*func)(x + inter, y + inter * t3);
+        y += inter * (t1 + 2 * t2 + 2 * t3 + t4) / 6;
+        x += inter;
+        vals[i] = y;
+      }
+  }
+
+/*--------------------------------------------------*
+|						    |
+|	RESOLUCION DE ECUACIONES EN DERIVADAS	    |
+|		    PARCIALES			    |
+|						    |
+*--------------------------------------------------*/
+
+/*
+    Método de las diferencias finitas en ecuaciones elípticas
+*/
+
+public status EDPDifFin(vals, nf, nc, nmi, cerr)
+matriz vals;	    /* matríz de valores de f en cada punto del reticulado */
+Sis_ord nf;	    /* Número de filas */
+Sis_ord nc;	    /* Número de columnas */
+iter_no nmi;	    /* Número máximo de iteraciones */
+real cerr;	    /* Cota de error asmisible */
+/*  A la salida sist contiene los valores calculados */
+  {
+    iter_no iter;   /* Número de iteración */
+    flag done;	    /* Error relativo de iteración */
+    real temp;	    /* Variable temporal */
+    counter i, j;   /* Contadores */
+    
+    iter = 0;
+    do
+      {
+        iter++;
+        done = TRUE;
+        for (i = 0; i < (nf - 1); i++)
+          for (j = 1; j < (nc - 1); j++)
+            {
+              temp = vals[((i - 1) * nf) + j] +
+              	     vals[((i + 1) * nf) + j] +
+              	     vals[(i * nf) + (j - 1)] +
+              	     vals[(i * nf) + (j + 1)];
+              temp /= 4.0;
+              if (fabs(vals[(i * nf) + j] - temp) > cerr)
+                done = !done;
+              vals[(i * nf) + j] = temp;
+            }
+      }
+    /* Obtener nueva iteración */
+    while ((!done) && (iter != nmi));
+    
+    return (done)? SUCCESS : FAIL;
+  }
+
+/*
+    Método de diferencias finitas en ecuaciones parabólicas.
+*/
+
+public status PDPDifFin(vals, nf, nc, tiv, tm, cerr)
+matriz vals;	    /* matriz de valores de f */
+Sis_ord nf;	    /* Número de filas */
+Sis_ord nc;	    /* Número de columnas */
+real tiv;	    /* Temperatura inicial de la varilla */
+real tm;	    /* Temperatura del medio */
+real cerr;	    /* Cota de uniformidad */
+  {
+    vector aux;	    /* Vector de valores de f en tiempo i */
+    flag done;	    /* Indicador de error */
+    counter i, j, k;
+    
+    /* Reservamos espacio para aux */
+    aux = (vector) calloc(nc + 1, sizeof(real));
+    if (aux == NULL)
+      return FAIL;
+    
+    i = 0;
+    vals[0] = aux[0] = tm;
+    for (j = 1; j < nc; j++)
+      vals[j] = aux[j] = tiv;
+    /* Hemos asignado valores a la primera fila */
+    
+    do
+      {
+        for (k = 1; k < nc; k++)
+          aux[k] = vals[(i * nf) + k];
+        i++;
+        aux[nc + 1] = aux[nc - 1];
+        done = TRUE;
+        vals[i * nf] = aux[0];
+        for (j = 1; j < nc; j++)
+          {
+            vals[(i * nf) + j] = 0.5 * (aux[j - 1] + aux[j + 1]);
+            if ( fabs(vals[(i * nf) + j] - vals[(i * nf) + j - 1]) > cerr)
+              done = !done;
+          }
+      }
+    while ( (!done) && (i < nf) );
+    
+    return (done)? SUCCESS : FAIL;
+  }
+
+/*
+    Método de diferencias finitas para ecuaciones hiperbólicas.
+*/
+
+public status HDPDifFin(vals, ne, ti)
+matriz vals;	/* Matríz de valores */
+counter ne,	/* Número de elementos */
+	ti;	/* Tiempo a transcurrir */
+ {
+   /* vals[0][] contiene los valores iniciales */
+   /* vals[i][j] tendrá los valores de f en cada punto en t = i + 1 */
+   counter i, j;
+      
+   for (i = 1; i < (ne - 1); i++)
+     {
+       vals[ne + i] = (vals[i - 1] + vals[i + 1]) / 2;
+     }
+   /* Hemos obtenido segunda fila */
+   
+   for (i = 2; i < (ti - 1); i++)
+     {
+       for (j = 1; j < (ne - 1); j++)
+         {
+           vals[(ne * i) + j] = vals[(ne * (i - 1)) + j - 1]
+           		      + vals[(ne * (i - 1)) + j + 1]
+           		      - vals[(ne * (i - 2)) + j];
+         }
+       /* Hemos obtenido el vector posición para t = i + 1 */
+       
+      }
+  
+    return SUCCESS;
+  }
+

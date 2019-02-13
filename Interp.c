@@ -1,0 +1,162 @@
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*
+*	MODULE
+*	    INTERPOL.C
+*	Function interpolation functions.
+*
+*	CONTENTS:
+*	    int IpLinear(x, y, np, xint, yint, npi)
+*	    int IpLagrange(x, y, np, xint, yint, npi)
+*
+*	CAVEATS:
+*	    Do not interpolate farther than the limits of the
+*	input values. Both arrays of x - y values must (obviously)
+*	match and must be sorted from lower to higher.
+*
+*	DESIGNED BY:
+*	    José Ramón Valverde Carrillo
+*
+*	LAST MODIFIED:
+*	    14 - dic - 1988 (implementation on IBM PC-AT)
+*	    16 - dic - 1988 (ported to the Mac)
+*	    17 - dic - 1988 (code splitting on the Mac)
+*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*/
+
+#include <stdio.h>
+
+#include <portable.h>
+
+#include <math.h>
+
+typedef double real;	    /* to control precision */
+
+typedef unsigned short iter_no;
+
+typedef unsigned Sys_ord;
+
+typedef unsigned counter;
+
+typedef real *matrix;
+
+typedef real *vector;
+
+#define odd(x)		((x) & 1)
+	/* zeroes all bits but the least significant. If the number
+	is even, then the result is 0 and returns FALSE, but if it
+	was odd, then the result is 1 and returns TRUE */
+
+#define even(x)		(! odd(x))
+
+
+private bool fsign(x)
+real x;
+  {
+    if (x > 0.0)
+      return 1;
+    else
+      if (x < 0.0)
+        return -1;
+      else
+        return 0;
+  }
+
+/*------------------------------*
+|				|
+|	INTERPOLATION		|
+|				|
+*-------------------------------*/
+
+/* linear interpolation */
+
+public status IpLinear(x, y, np, xint, yint, npi)
+real *x;	    /* sorted array of x values */
+real *y;	    /* matching array of y values	    */
+counter np;	    /* number of points		    */
+real *xint;	    /* array with x values to interpolate */
+real *yint;	    /* array with interpolated y values */
+counter npi;	    /* number of points to interpolate */
+  {
+    counter i, count, error;
+    
+    error = 0;
+    for (count = 0; count < npi; count++)
+      {
+        if ((xint[count] < x[0]) || (xint[count] > x[np - 1]))
+          {	    /* don't compute the point */
+            error --;
+            yint[count] = 0.0;	/* null the value */
+          }
+        else
+          {
+            i = 1;
+            while (xint[count] > x[i]) i++;
+            yint[count] = (x[i] - xint[count]) * y[i - 1];
+            yint[count] += (xint[count] - x[i - 1]) * y[i];
+            yint[count] /= x[i] - x[i - 1];
+          }
+      }
+    return error;   /* error = 0 => SUCCESS; error < 0 ==> FAIL */
+  }
+
+/* Polinomial or Lagrange interpolation */
+
+public status IpLagrange(x, y, np, xint, yint, npi)
+real *x;	    /* sorted array of x values  */
+real *y;	    /* matching array of y values    */
+counter np;	    /* number of points	    */
+real *xint;	    /* array with x values to interpolate */
+real *yint;	    /* array with interpolated y values */
+counter npi;	    /* number of points to interpolate */
+  {
+    counter i, j, count, error;
+    real c, d;
+    
+    error = 0;
+    for (count = 0; count < npi; count++)
+      {
+        if ((xint[count] < x[0]) || (xint[count] > x[np - 1]))
+          {
+            error--;
+            yint[count] = 0.0;
+          }
+        else
+          {
+            for (i = 0; i < np; i++)
+              {
+                c = 1.0;
+                for (j = 0; j < np; j++)
+                  if (j != i)
+                    {
+                      d = (xint[count] - x[j]) / (x[i] - x[j]);
+                      c *= d;
+                    }
+                yint[count] += c * y[i];
+              }
+          }
+      }
+    return error;
+  }
+
+real Tchebyshev(n, x)
+counter n;
+real x;
+/* Tchebyshev polynomium of degree n */
+  {
+    register counter i;
+    real t0, t1, t2;
+    
+    t0 = 1.0;
+    t1 = x;
+    for (i = 2; i <= n; i++)
+      {
+        t2 = 2.0 * x * t1 - t0;
+        t0 = t1;
+        t1 = t2;
+      }
+    return ((n == 0)? 1.0: t1);
+  }
+
+

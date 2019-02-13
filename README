@@ -1,0 +1,37 @@
+JR's Numerical Library
+======================
+
+This is the start of a Numerical Computing library I began writing long
+ago (see the files header comments). It was intended to be rather complete
+and generic, and was to include many more computational tasks as well as
+literate descriptions of the methods used.
+
+Actually most of the code is already written (on paper) using pesudocode
+and all I needed was to write the actual code and verification routines.
+
+As I advanced in my PhD I had less and less time to devote to these
+pet projects, and after I started actual working at CSIC (the Spanish
+Research Council), I never had time again to work on this.
+
+Most routines come with test code to verify they work as expected, but
+you should exercise caution before using them.
+
+I don't know if I will ever have time again for this, not at least while
+working at CSIC, that's for sure. So, take it for what it's worth, and if 
+you find them useful or extend the library, let me know.
+
+Otherwise, this is place in the Public Domain, and you may freely use them
+(you can't claim the copyright nor prevent others from using this code,
+though).
+
+I'm adding too several generic packages for manipulation of advanced data 
+structures. This code was once submitted for inclusion in an algorithms CD
+of which I never heard again, so maybe it's out there.
+
+
+Have fun,
+    	    	    	    	    	j
+
+--
+José R. Valverde
+jrvalverde
