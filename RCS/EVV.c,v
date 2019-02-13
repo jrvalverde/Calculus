@@ -1,0 +1,172 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	2004.02.22.21.01.08;	author jr;	state Exp;
+branches;
+next	;
+
+
+desc
+@Eigenvalues and eigenvectors [j]
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*
+*	MODULE
+*	    EIGENVAL_VECT.C
+*	Calculation of eigenvalues and eigenvectors of a matrix
+*
+*	CONTENTS:
+*	    void EVLeverrierFaddev(n, a, p)
+*	    int EVSuccApprox(n, a, x, avmax, cerr, nmi)
+*
+*	DESIGNED BY:
+*	    J. R. Valverde Carrillo.
+*
+*	LAST MODIFICATION:
+*	    14 - dic - 1988	(IBM PC-AT)
+*	    16 - dic - 1988	(Mac)
+*	    17 - dic - 1988	(Subdivision in small modules)
+*	    07 - sep - 1993	(UNIX)
+*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*/
+
+#include <stdio.h>
+
+#include "portable.h"
+
+#include <math.h>
+
+typedef double real;	    /* To be able to control precision */
+
+typedef unsigned short iter_no;
+
+typedef unsigned Sys_ord;
+
+typedef unsigned counter;
+
+typedef real *matrix;
+
+typedef real *vector;
+
+#define odd(x)		((x) & 1)
+	/* Sets all bits to zero but the last. If it is even it
+	returns 0 (FALSE) and if not, 1 (TRUE) */
+
+#define even(x)		(! odd(x))
+
+/*--------------------------------------------------*
+|						    |
+|	CALCULO DE AUTOVALORES Y AUTOVECTORES	    |
+|						    |
+*---------------------------------------------------*/
+
+/*
+	Leverrier - Faddev Method
+    to get the coefficients of the characteristic
+    polynomion.
+*/
+
+public status EVLeverrierFaddev(n, a, p)
+Sys_ord n;	/* Order of the System */
+matrix a;	/* Given matrix */
+vector p;	/* System vector keeping the coefficients */
+  {
+    matrix b;	/* matrix = ([A] - tr([A]) [I]) [A] */
+    vector c;	/* vector used in the computation of [A] x [B] */
+    counter i, j, k, l;
+    
+    b = (matrix) calloc(n * n, sizeof(real));
+    c = (vector) calloc(n, sizeof(real));
+    
+    if ( (b == NULL) || (c == NULL) )
+      return FAIL;
+    
+    /* Process */
+    j = n * n;
+    for (i = 0; i < j; i++)
+      b[i] = a[i];
+    for (i = 0; i < n; i++)
+      {
+        for (j = 0; j < n; j++)
+          p[i] += b[j * n + j];
+        p[i] /= i;
+        
+        /* resulting p[i] */
+        for (j = 0; j < n; j++)
+          b[j * n + j] -= p[i];
+        for (j = 0; j < n; j++)
+          {
+            for (k = 0; k < n; k++)
+              {
+                c[k] = b[k * n + j];
+                b[k * n + j] = 0.0;
+              }
+            for (k = 0; k < n; k++)
+              for (l = 0; l < n; l++)
+                b[k * n + j] += a[k * n + l] * c[l];
+          }
+      }
+    free(b);
+    free(c);
+    
+    return SUCCESS;
+  }
+
+public status EVASuccApprox(n, a, x, avmax, cerr, nmi)
+Sys_ord n;	/* System order */
+matrix a;	/* Data matrix */
+vector x;	/* Eigenvector. MUST HAVE AN INITIAL VALUE */
+real *avmax;	/* Maximum eigenvalue */
+real cerr;	/* Max acceptable error */
+iter_no nmi;	/* Max number of iterations */
+  {
+    counter i, j;
+    iter_no iter;   /* iteration counter */
+    vector c;	    /* vector product of a . x */
+    real temp,	    /* temporal variable */
+    	 maxi;	    /* max value of c in each iteration */
+    
+    c = (vector) calloc(n, sizeof(real));
+    if (c == NULL) return FAIL;
+    
+    iter = 0;
+    maxi = *avmax;
+    do
+      {
+        iter++;
+        for (i = 0; i < n; i++)
+          for (j = 0; j < n; j++)
+            c[i] += a[i * n + j] * x[j];
+        temp = maxi;
+        maxi = 0.0;
+        for (i = 0; i < n; i++)
+          if (fabs(c[i]) > fabs(maxi))
+            maxi = c[i];
+        for (i = 0; i < n; i++)
+          {
+            x[i] = c[i] / maxi;
+            c[i] = 0.0;
+          }
+      }
+    while ((fabs(temp - maxi) > cerr) && (iter != nmi));
+    
+    *avmax = maxi;
+    free(c);
+    return (iter == nmi)? FAIL : SUCCESS;
+  }
+
+@
