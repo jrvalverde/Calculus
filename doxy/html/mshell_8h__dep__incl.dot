@@ -1,0 +1,6 @@
+digraph inheritance
+{
+  Node71 [shape="box",label="mshell.h",fontsize=10,height=0.2,width=0.4,fontname="Helvetica",color="black",style="filled" fontcolor="white"];
+  Node72 -> Node71 [color="midnightblue",fontsize=10,style="solid",fontname="Helvetica"];
+  Node72 [shape="box",label="mshell.c",fontsize=10,height=0.2,width=0.4,fontname="Helvetica",color="black",URL="$mshell_8c.html"];
+}

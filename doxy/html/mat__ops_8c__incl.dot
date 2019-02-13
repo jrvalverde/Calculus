@@ -1,0 +1,16 @@
+digraph inheritance
+{
+  Node32 [shape="box",label="mat_ops.c",fontsize=10,height=0.2,width=0.4,fontname="Helvetica",color="black",style="filled" fontcolor="white"];
+  Node33 -> Node32 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="Helvetica"];
+  Node33 [shape="box",label="stdio.h",fontsize=10,height=0.2,width=0.4,fontname="Helvetica",color="grey75"];
+  Node34 -> Node32 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="Helvetica"];
+  Node34 [shape="box",label="math.h",fontsize=10,height=0.2,width=0.4,fontname="Helvetica",color="grey75"];
+  Node35 -> Node32 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="Helvetica"];
+  Node35 [shape="box",label="stdlib.h",fontsize=10,height=0.2,width=0.4,fontname="Helvetica",color="grey75"];
+  Node36 -> Node32 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="Helvetica"];
+  Node36 [shape="box",label="bits/nan.h",fontsize=10,height=0.2,width=0.4,fontname="Helvetica",color="grey75"];
+  Node37 -> Node32 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="Helvetica"];
+  Node37 [shape="box",label="portable.h",fontsize=10,height=0.2,width=0.4,fontname="Helvetica",color="black",URL="$portable_8h.html"];
+  Node38 -> Node32 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="Helvetica"];
+  Node38 [shape="box",label="matrix.h",fontsize=10,height=0.2,width=0.4,fontname="Helvetica",color="black",URL="$matrix_8h.html"];
+}
