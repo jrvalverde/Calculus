@@ -1,0 +1,73 @@
+\section{mat\_\-arith.c File Reference}
+\label{mat__arith_8c}\index{mat_arith.c@{mat\_\-arith.c}}
+Basic arithmetic operations with matrices. 
+
+
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$math.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$bits/nan.h$>$}\par
+{\tt \#include \char`\"{}portable.h\char`\"{}}\par
+{\tt \#include \char`\"{}matrix.h\char`\"{}}\par
+
+
+Include dependency graph for mat\_\-arith.c:\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf status} {\bf mat\_\-sum} ({\bf matrix} result, {\bf matrix} mat1, {\bf matrix} mat2)
+\begin{CompactList}\small\item\em MAT C = A + B;.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-substract} ({\bf matrix} result, {\bf matrix} mat1, {\bf matrix} mat2)
+\begin{CompactList}\small\item\em MAT res = mat1 - mat2.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-multiply} ({\bf matrix} prod, {\bf matrix} fact1, {\bf matrix} fact2)
+\begin{CompactList}\small\item\em MAT prod[m][p] = fact1[m][n] $\ast$ fact2[n][p]; Compute the product of two matrices.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-scalar\_\-product} ({\bf matrix} scprod, {\bf matrix} mat, {\bf real} lambda)
+\begin{CompactList}\small\item\em compute the scalar product\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Basic arithmetic operations with matrices.
+
+
+
+An implementation of marix arithmetics. This module includes functions to perform matrix summation, substraction, multiplication and computing the scalar product. These operations are base to more advanced matrix calculus manipulations.
+
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf portable.h}\end{Desc}
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf matrix.h}\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf matrix.h} for a general introduction to matrices\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-init.c} to learn how you can assign initial values to a matrix or its elements.\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-ops.c} to learn more about how to perform basic matrix operations.\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-test.c} Is an auxiliary module with the test code of these functions used to debug this module (last time everything went OK).\end{Desc}
+\begin{Desc}
+\item[Author: ]\par
+Jos\'{e} Ram\'{o}n Valverde Carrillo ({\tt jrvalverde@acm.org})\end{Desc}
+\begin{Desc}
+\item[Version: ]\par
+3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+23 - february - 2004 v3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+11 - february - 2004 v2.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+1 - october - 1988 Last modification of v1.0\end{Desc}
+COPYRIGHT: 169 Yo\-Ego. Since I have no cash, I can't register this (nor do I believe I should). So this module is left in the PUBLIC DOMAIN. It is furthermore forbidden its use for commercial purposes unless I get a share on the profits. I say. Yo\-Ego.
+
+\$Id\$ \$Log\$
+
+
+
+Definition in file {\bf mat\_\-arith.c}.

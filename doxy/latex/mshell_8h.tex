@@ -1,0 +1,160 @@
+\section{mshell.h File Reference}
+\label{mshell_8h}\index{mshell.h@{mshell.h}}
+
+
+This graph shows which files directly or indirectly include this file:\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define {\bf MEM\_\-LIST}
+\item 
+\#define {\bf MEM\_\-WHERE}
+\item 
+\#define {\bf malloc}(a)\ mem\_\-alloc( (a), \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\- )
+\item 
+\#define {\bf realloc}(a, b)\ mem\_\-realloc( (a), (b), \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\- )
+\item 
+\#define {\bf free}(a)\ mem\_\-free( (a), \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\- )
+\item 
+\#define {\bf strdup}(a)\ mem\_\-strdup( (a), \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\- )
+\item 
+\#define {\bf calloc}(a, b)\ malloc( ((a)$\ast$(b)) )
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+unsigned long {\bf Mem\_\-Used} (void)
+\item 
+void {\bf Mem\_\-Display} (FILE $\ast$)
+\item 
+void $\ast$ {\bf mem\_\-alloc} (size\_\-t, char $\ast$, int)
+\item 
+void $\ast$ {\bf mem\_\-realloc} (void $\ast$, size\_\-t, char $\ast$, int)
+\item 
+void {\bf mem\_\-free} (void $\ast$, char $\ast$, int)
+\item 
+char $\ast$ {\bf mem\_\-strdup} (char $\ast$, char $\ast$, int)
+\end{CompactItemize}
+
+
+\subsection{Define Documentation}
+\index{mshell.h@{mshell.h}!calloc@{calloc}}
+\index{calloc@{calloc}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define calloc(a, b)\ malloc( ((a)$\ast$(b)) )}\label{mshell_8h_a6}
+
+
+
+
+Definition at line 40 of file mshell.h.
+
+Referenced by mem\_\-alloc().\index{mshell.h@{mshell.h}!free@{free}}
+\index{free@{free}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define free(a)\ mem\_\-free( (a), \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\- )}\label{mshell_8h_a4}
+
+
+
+
+Definition at line 38 of file mshell.h.
+
+Referenced by mat\_\-alloc(), mat\_\-free(), and mem\_\-free().\index{mshell.h@{mshell.h}!malloc@{malloc}}
+\index{malloc@{malloc}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define malloc(a)\ mem\_\-alloc( (a), \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\- )}\label{mshell_8h_a2}
+
+
+
+
+Definition at line 36 of file mshell.h.
+
+Referenced by mat\_\-alloc().\index{mshell.h@{mshell.h}!MEM_LIST@{MEM\_\-LIST}}
+\index{MEM_LIST@{MEM\_\-LIST}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MEM\_\-LIST}\label{mshell_8h_a0}
+
+
+
+
+Definition at line 13 of file mshell.h.\index{mshell.h@{mshell.h}!MEM_WHERE@{MEM\_\-WHERE}}
+\index{MEM_WHERE@{MEM\_\-WHERE}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MEM\_\-WHERE}\label{mshell_8h_a1}
+
+
+
+
+Definition at line 14 of file mshell.h.
+
+Referenced by mem\_\-alloc(), mem\_\-free(), mem\_\-realloc(), and mem\_\-strdup().\index{mshell.h@{mshell.h}!realloc@{realloc}}
+\index{realloc@{realloc}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define realloc(a, b)\ mem\_\-realloc( (a), (b), \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\- )}\label{mshell_8h_a3}
+
+
+
+
+Definition at line 37 of file mshell.h.
+
+Referenced by mem\_\-realloc().\index{mshell.h@{mshell.h}!strdup@{strdup}}
+\index{strdup@{strdup}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define strdup(a)\ mem\_\-strdup( (a), \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\- )}\label{mshell_8h_a5}
+
+
+
+
+Definition at line 39 of file mshell.h.
+
+\subsection{Function Documentation}
+\index{mshell.h@{mshell.h}!mem_alloc@{mem\_\-alloc}}
+\index{mem_alloc@{mem\_\-alloc}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ mem\_\-alloc (size\_\-t, char $\ast$, int)}\label{mshell_8h_a9}
+
+
+
+
+Definition at line 112 of file mshell.c.
+
+References calloc, HDR\_\-2\_\-CLIENT, mem\_\-list\_\-add(), mem\_\-size, MEM\_\-WHERE, MEMTAG, memnod::mh\_\-file, memnod::mh\_\-line, memnod::mh\_\-size, memnod::mh\_\-tag, and RESERVE\_\-SIZE.
+
+Referenced by mem\_\-strdup().\index{mshell.h@{mshell.h}!Mem_Display@{Mem\_\-Display}}
+\index{Mem_Display@{Mem\_\-Display}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Mem\_\-Display (FILE $\ast$)}\label{mshell_8h_a8}
+
+
+
+
+Definition at line 364 of file mshell.c.
+
+References mem\_\-size, MEMTAG, memnod::mh\_\-file, memnod::mh\_\-line, memnod::mh\_\-next, memnod::mh\_\-size, and memnod::mh\_\-tag.
+
+Referenced by mem\_\-list\_\-add(), mem\_\-list\_\-delete(), and mem\_\-tag\_\-err().\index{mshell.h@{mshell.h}!mem_free@{mem\_\-free}}
+\index{mem_free@{mem\_\-free}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void mem\_\-free (void $\ast$, char $\ast$, int)}\label{mshell_8h_a11}
+
+
+
+
+Definition at line 286 of file mshell.c.
+
+References CLIENT\_\-2\_\-HDR, free, mem\_\-list\_\-delete(), mem\_\-size, Mem\_\-Tag\_\-Err, MEM\_\-WHERE, MEMTAG, memnod::mh\_\-size, and memnod::mh\_\-tag.\index{mshell.h@{mshell.h}!mem_realloc@{mem\_\-realloc}}
+\index{mem_realloc@{mem\_\-realloc}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ mem\_\-realloc (void $\ast$, size\_\-t, char $\ast$, int)}\label{mshell_8h_a10}
+
+
+
+
+Definition at line 167 of file mshell.c.
+
+References CLIENT\_\-2\_\-HDR, HDR\_\-2\_\-CLIENT, mem\_\-list\_\-add(), mem\_\-list\_\-delete(), mem\_\-size, Mem\_\-Tag\_\-Err, MEM\_\-WHERE, MEMTAG, memnod::mh\_\-file, memnod::mh\_\-line, memnod::mh\_\-size, memnod::mh\_\-tag, realloc, and RESERVE\_\-SIZE.\index{mshell.h@{mshell.h}!mem_strdup@{mem\_\-strdup}}
+\index{mem_strdup@{mem\_\-strdup}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ mem\_\-strdup (char $\ast$, char $\ast$, int)}\label{mshell_8h_a12}
+
+
+
+
+Definition at line 241 of file mshell.c.
+
+References mem\_\-alloc(), and MEM\_\-WHERE.\index{mshell.h@{mshell.h}!Mem_Used@{Mem\_\-Used}}
+\index{Mem_Used@{Mem\_\-Used}!mshell.h@{mshell.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}unsigned long Mem\_\-Used (void)}\label{mshell_8h_a7}
+
+
+
+
+Definition at line 341 of file mshell.c.
+
+References mem\_\-size.

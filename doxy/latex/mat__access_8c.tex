@@ -1,0 +1,77 @@
+\section{mat\_\-access.c File Reference}
+\label{mat__access_8c}\index{mat_access.c@{mat\_\-access.c}}
+Routines to access matrix elements and various bits of data. 
+
+
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$math.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$bits/nan.h$>$}\par
+{\tt \#include \char`\"{}portable.h\char`\"{}}\par
+{\tt \#include \char`\"{}matrix.h\char`\"{}}\par
+
+
+Include dependency graph for mat\_\-access.c:\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public int {\bf mat\_\-rows} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em return number of rows of a matrix\item\end{CompactList}\item 
+public int {\bf mat\_\-cols} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em return number of columns of a matrix\item\end{CompactList}\item 
+public {\bf real} $\ast$$\ast$ {\bf mat\_\-values} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em return a (handy) pointer to the table of values of a matrix\item\end{CompactList}\item 
+public {\bf real} $\ast$ {\bf mat\_\-row} ({\bf matrix} mat, int row\_\-number)
+\begin{CompactList}\small\item\em return a row of a matrix\item\end{CompactList}\item 
+public {\bf real} {\bf mat\_\-element} ({\bf matrix} mat, int row, int col)
+\begin{CompactList}\small\item\em return value of matrix element mat[row][col]\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Routines to access matrix elements and various bits of data.
+
+
+
+This module hids the matrix implementation by providing various ways to query and obtain data from a matrix data object. While you may access some data structure fields directly, it is strongly advised  that you don't and that all accesses to internal or descriptive data be done through the interfaces included in this module. This way, should the implementation change, your program won't break.
+
+For all purposes, a matrix is a bi-dimensional object that is composed of 'real' numbers arranged in rows and columns. A matrix M$_{\mbox{m183n}}$ has m rows and n columns. You may query de data stored either individually (indexed by row and column), arranged as rows (a uni-dimensional C vector or array with offset at one --1), or as a whole bi-dimensional C array with offsets at one --1)
+
+\begin{Desc}
+\item[Note: ]\par
+It is important to notice that offsets in matrices all start at  one unlike conventional C arrays. This is intentionally done to comply with the standard mathematical convention and ease use and translation of mathematical methods.\end{Desc}
+\begin{Desc}
+\item[Note: ]\par
+In previous (v1) implementations, matrix elements were stored at zero-offset fr maximal compatibility with C, but this proved conceptually more cumbersome to extend and more difficult to  implement and debug.\end{Desc}
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf matrix.h}\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf matrix.h} for a general introduction to matrices\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-housekeep.c} to learn how to create/destroy matrices before using this module.\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-init.c} to learn how you can assign initial values to a matrix or its elements.\end{Desc}
+\begin{Desc}
+\item[Author: ]\par
+Jos\'{e} Ram\'{o}n Valverde Carrillo ({\tt jrvalverde@acm.org})\end{Desc}
+\begin{Desc}
+\item[Version: ]\par
+3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+23 - february - 2004 v3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+11 - february - 2004 v2.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+1 - october - 1988 Last modification of v1.0\end{Desc}
+COPYRIGHT: 169 Yo\-Ego. Since I have no cash, I can't register this (nor do I believe I should). So this module is left in the PUBLIC DOMAIN. It is furthermore forbidden its use for commercial purposes unless I get a share on the profits. I say. Yo\-Ego.
+
+\$Id\$ \$Log\$
+
+
+
+Definition in file {\bf mat\_\-access.c}.

@@ -1,0 +1,76 @@
+\section{mat\_\-init.c File Reference}
+\label{mat__init_8c}\index{mat_init.c@{mat\_\-init.c}}
+2D-matrix and elements initialization routines. 
+
+
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$math.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$bits/nan.h$>$}\par
+{\tt \#include \char`\"{}portable.h\char`\"{}}\par
+{\tt \#include \char`\"{}matrix.h\char`\"{}}\par
+
+
+Include dependency graph for mat\_\-init.c:\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf status} {\bf mat\_\-set} ({\bf matrix} mat, int row, int col, {\bf real} value)
+\begin{CompactList}\small\item\em set matrix element mat[row][col] to value\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-init} ({\bf matrix} mat, {\bf real} value)
+\begin{CompactList}\small\item\em Set all matrix elements to the specified value.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-identity} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em Compute the identity matrix of dimension [n] x [n]: Every element ij / i $<$$>$ j is 0, every ij / i = j is 1.\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+2D-matrix and elements initialization routines.
+
+
+
+This module implements functions to initialize matrix element values. In addition to allowing assignment to any matrix element, functions are provided to initialize a full matrix to a set of predefined common values (e.g. the identity matrix) or to set all elements to the same value (e.g. 0.0 for the null matrix).
+
+There is a second way of initializing/accessing matrix elements, which consists in querying the matrix for its full value set, or a whole row and handling it like a normal C array (albeit a one-offset one). This may be faster under some conditions for performing many asignments or operations. However, in general, you are advised to use these functions for initialization.
+
+\begin{Desc}
+\item[Note: ]\par
+Should you decide to access the matrix values directly as a C array, you must always keep in mind that they are all one-offset (i.e. subindexes start at one) instead of zero-offset like in C.\end{Desc}
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf portable.h}\end{Desc}
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf matrix.h}\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf matrix.h} for a general introduction to matrices\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-housekeep.c} to learn how to create/destroy matrices before using this module.\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-init.c} to learn how you can assign initial values to a matrix or its elements.\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-ops.c} to learn more about how to perform basic matrix operations.\end{Desc}
+\begin{Desc}
+\item[Author: ]\par
+Jos\'{e} Ram\'{o}n Valverde Carrillo ({\tt jrvalverde@acm.org})\end{Desc}
+\begin{Desc}
+\item[Version: ]\par
+3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+23 - february - 2004 v3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+11 - february - 2004 v2.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+1 - october - 1988 Last modification of v1.0\end{Desc}
+COPYRIGHT: 169 Yo\-Ego. Since I have no cash, I can't register this (nor do I believe I should). So this module is left in the PUBLIC DOMAIN. It is furthermore forbidden its use for commercial purposes unless I get a share on the profits. I say. Yo\-Ego.
+
+\$Id\$ \$Log\$
+
+
+
+Definition in file {\bf mat\_\-init.c}.

@@ -1,0 +1,69 @@
+\section{mat\_\-housekeep.c File Reference}
+\label{mat__housekeep_8c}\index{mat_housekeep.c@{mat\_\-housekeep.c}}
+Routines for creating/destroying 2D matrices. 
+
+
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$math.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$bits/nan.h$>$}\par
+{\tt \#include \char`\"{}portable.h\char`\"{}}\par
+{\tt \#include \char`\"{}matrix.h\char`\"{}}\par
+
+
+Include dependency graph for mat\_\-housekeep.c:\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf status} {\bf mat\_\-alloc} ({\bf matrix} $\ast$pmat, int rows, int cols)
+\begin{CompactList}\small\item\em Allocate a new, uninitialized 2-D matrix.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-free} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em free a 2D-matrix\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Routines for creating/destroying 2D matrices.
+
+
+
+This module defines the routines used for creating and destroying bidimensional matrices used for 2D matrix calculus. This is the  starting point before doing any worthy work.
+
+In order to manipulate matrices using the libmatrix library, you need to housekeep them with the routines provided in this module. The library uses a special implementation in order to allow for easy and efficient matrix manipulation: to achieve this, special, additional information is added to the matrix data type. For this reason you should always create and destroy 2D-matrices using the routines provided.
+
+An interesting side effect is that by using these routines and the ones provided in the matrix\_\-access module you do not need to be aware of the internals of the implementation: not only means this less mnemonic effort, it also gives the implementer more freedom to adapt the implementation in the future without any need to affect your programs, thus increasing maintainability.
+
+Right now, two implementations are provided, one is more straightforward and easier to understand and maintain, while the other should help yield some speed increases in some very frequent operations. You can select which one is used at compile time by defining  MAT\_\-OPTIMIZE.
+
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf matrix.h}\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf matrix.h} to learn about the definition of a  2D-matrix and the additional housekeeping information used to better understand this module.\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-access.c} once you know how to create/destroy bi-dimensional  matrices, you may procceed to learn more about how to obtain various bits of information about your matrices and access its data.\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-test.c} to view some examples on using this code and obtain debugging information.\end{Desc}
+\begin{Desc}
+\item[Author: ]\par
+Jos\'{e} Ram\'{o}n Valverde Carrillo ({\tt jrvalverde@acm.org})\end{Desc}
+\begin{Desc}
+\item[Version: ]\par
+3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+23 - february - 2004 v3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+11 - february - 2004 v2.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+1 - october - 1988 Last modification of v1.0\end{Desc}
+COPYRIGHT: 169 Yo\-Ego. Since I have no cash, I can't register this (nor do I believe I should). So this module is left in the PUBLIC DOMAIN. It is furthermore forbidden its use for commercial purposes unless I get a share on the profits. I say. Yo\-Ego.
+
+\$Id\$ \$Log\$
+
+
+
+Definition in file {\bf mat\_\-housekeep.c}.

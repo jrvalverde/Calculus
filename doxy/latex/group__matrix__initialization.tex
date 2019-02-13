@@ -1,0 +1,86 @@
+\section{Matrix\_\-initialization}
+\label{group__matrix__initialization}\index{Matrix_initialization@{Matrix\_\-initialization}}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf status} {\bf mat\_\-set} ({\bf matrix} mat, int row, int col, {\bf real} value)
+\begin{CompactList}\small\item\em set matrix element mat[row][col] to value\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-init} ({\bf matrix} mat, {\bf real} value)
+\begin{CompactList}\small\item\em Set all matrix elements to the specified value.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-identity} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em Compute the identity matrix of dimension [n] x [n]: Every element ij / i $<$$>$ j is 0, every ij / i = j is 1.\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{Matrix_initialization@{Matrix\_\-initialization}!mat_identity@{mat\_\-identity}}
+\index{mat_identity@{mat\_\-identity}!Matrix_initialization@{Matrix\_\-initialization}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-identity ({\bf matrix} {\em mat})}\label{group__matrix__initialization_a2}
+
+
+Compute the identity matrix of dimension [n] x [n]: Every element ij / i $<$$>$ j is 0, every ij / i = j is 1.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by {\bf mat\_\-alloc()} {\rm (p.\,\pageref{group__matrix__housekeeping_a0})} that will be set to the identity matrix\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 156 of file mat\_\-init.c.
+
+References matrix::cols, MAT\_\-NOTSQUARE, real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-invert().\index{Matrix_initialization@{Matrix\_\-initialization}!mat_init@{mat\_\-init}}
+\index{mat_init@{mat\_\-init}!Matrix_initialization@{Matrix\_\-initialization}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-init ({\bf matrix} {\em mat}, {\bf real} {\em value})}\label{group__matrix__initialization_a1}
+
+
+Set all matrix elements to the specified value.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by {\bf mat\_\-alloc()} {\rm (p.\,\pageref{group__matrix__housekeeping_a0})} whose values will be all set to the real value specified \item[{\em 
+value}]the value to assign to all matrix elements\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 119 of file mat\_\-init.c.
+
+References matrix::cols, real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-assign().\index{Matrix_initialization@{Matrix\_\-initialization}!mat_set@{mat\_\-set}}
+\index{mat_set@{mat\_\-set}!Matrix_initialization@{Matrix\_\-initialization}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}mat\_\-set ({\bf matrix} {\em mat}, int {\em row}, int {\em col}, {\bf real} {\em value})}\label{group__matrix__initialization_a0}
+
+
+set matrix element mat[row][col] to value
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix whose value we want to set \item[{\em 
+row}]value row offset \item[{\em 
+col}]value column offset \item[{\em 
+value}]value to assign to mat[row][col]\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise\end{Desc}
+\begin{Desc}
+\item[Note: ]\par
+if MAT\_\-PARANOID is defined, extra bound checking is performed at a high execution penalty. \end{Desc}
+
+
+Definition at line 96 of file mat\_\-init.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.

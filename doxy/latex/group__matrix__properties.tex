@@ -1,0 +1,105 @@
+\section{Matrix\_\-properties}
+\label{group__matrix__properties}\index{Matrix_properties@{Matrix\_\-properties}}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf boolean} {\bf mat\_\-is\_\-square} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em query if a matrix is square\item\end{CompactList}\item 
+public {\bf boolean} {\bf mat\_\-is\_\-symmetric} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em check if a matrix is symmetric\item\end{CompactList}\item 
+public {\bf boolean} {\bf mat\_\-is\_\-identity} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em query if this is an identity matrix\item\end{CompactList}\item 
+public {\bf boolean} {\bf mat\_\-is\_\-null} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em query if a matrix is null\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{Matrix_properties@{Matrix\_\-properties}!mat_is_identity@{mat\_\-is\_\-identity}}
+\index{mat_is_identity@{mat\_\-is\_\-identity}!Matrix_properties@{Matrix\_\-properties}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf boolean} mat\_\-is\_\-identity ({\bf matrix} {\em mat})}\label{group__matrix__properties_a2}
+
+
+query if this is an identity matrix
+
+Return if the matrix is an identity matrix. The matrix must be a square matrix and have all elements in the main diagonal set to  one, and all off-diagonal elements set to zero.
+
+An identity matrix of order n, I$_{\mbox{nn}}$ verifies
+
+A$_{\mbox{mn}}$ I$_{\mbox{nn}}$ = A$_{\mbox{mn}}$
+
+I$_{\mbox{nn}}$ B$_{\mbox{np}}$ = B$_{\mbox{np}}$\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix to verify\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+TRUE if the matrix is an identity matrix. \end{Desc}
+
+
+Definition at line 149 of file mat\_\-properties.c.
+
+References matrix::cols, FALSE, matrix::rows, TRUE, and matrix::values.\index{Matrix_properties@{Matrix\_\-properties}!mat_is_null@{mat\_\-is\_\-null}}
+\index{mat_is_null@{mat\_\-is\_\-null}!Matrix_properties@{Matrix\_\-properties}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf boolean} mat\_\-is\_\-null ({\bf matrix} {\em mat})}\label{group__matrix__properties_a3}
+
+
+query if a matrix is null
+
+Find out if we are dealing with the null matrix. A null matrix has all of its elements set to zero.\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix to verify\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+TRUE if the matrix is a null matrix. \end{Desc}
+
+
+Definition at line 178 of file mat\_\-properties.c.
+
+References matrix::cols, FALSE, real, matrix::rows, TRUE, and matrix::values.\index{Matrix_properties@{Matrix\_\-properties}!mat_is_square@{mat\_\-is\_\-square}}
+\index{mat_is_square@{mat\_\-is\_\-square}!Matrix_properties@{Matrix\_\-properties}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf boolean} mat\_\-is\_\-square ({\bf matrix} {\em mat})}\label{group__matrix__properties_a0}
+
+
+query if a matrix is square
+
+Verify if both dimensions of a matrix are the same (i.e. it is square)\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix to verify\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+TRUE if the matrix is square, false otherwise \end{Desc}
+
+
+Definition at line 79 of file mat\_\-properties.c.
+
+References matrix::cols, and matrix::rows.\index{Matrix_properties@{Matrix\_\-properties}!mat_is_symmetric@{mat\_\-is\_\-symmetric}}
+\index{mat_is_symmetric@{mat\_\-is\_\-symmetric}!Matrix_properties@{Matrix\_\-properties}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf boolean} mat\_\-is\_\-symmetric ({\bf matrix} {\em mat})}\label{group__matrix__properties_a1}
+
+
+check if a matrix is symmetric
+
+Check if a matrix is symmetric. A symmetric matric has all its elements symmetric with respect to the main diagonal (a$_{\mbox{ij}}$ = a$_{\mbox{ji}}$): A=A'
+
+This is useful for handling quadratic forms: Given A$_{\mbox{mn}}$ and X$_{\mbox{n1}}$ then \[ X^T A X = \sum_{i=1}^n \sum{j=1}^n a_{ij} x{i} x{j} \] and conversely, given a quadratic form, it may be converted to matrix form, but there are many ways to choose a matrix A. One of them is to select A a symmetric matrix: it is then easier to select its values.\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix to verify\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+TRUE if the matrix is symmetric, FALSE otherwise. \end{Desc}
+
+
+Definition at line 101 of file mat\_\-properties.c.
+
+References matrix::cols, FALSE, real, matrix::rows, TRUE, and matrix::values.

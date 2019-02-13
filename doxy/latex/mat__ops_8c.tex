@@ -1,0 +1,71 @@
+\section{mat\_\-ops.c File Reference}
+\label{mat__ops_8c}\index{mat_ops.c@{mat\_\-ops.c}}
+2D-matrix and elements basic operations. 
+
+
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$math.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$bits/nan.h$>$}\par
+{\tt \#include \char`\"{}portable.h\char`\"{}}\par
+{\tt \#include \char`\"{}matrix.h\char`\"{}}\par
+
+
+Include dependency graph for mat\_\-ops.c:\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf status} {\bf mat\_\-assign} ({\bf matrix} dest, {\bf matrix} orig)
+\begin{CompactList}\small\item\em MAT dest = orig.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-transpose} ({\bf matrix} trn, {\bf matrix} mat)
+\begin{CompactList}\small\item\em MAT trn = TRN(mat) Compute the transpose of a matrix.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-invert} ({\bf matrix} B, {\bf matrix} C)
+\begin{CompactList}\small\item\em MAT B = INV ( C );.\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+2D-matrix and elements basic operations.
+
+
+
+This module implements basic operations on 2D matrices: assignment of one matrix contents to another, computing the transpose and the inverse.
+
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf portable.h}\end{Desc}
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf matrix.h}\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf matrix.h} for a general introduction to matrices\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-housekeep.c} to learn how to create/destroy matrices before using this module.\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-init.c} to learn how you can assign initial values to a matrix or its elements.\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-arith.c} to learn more about how to perform basic matrix arithmetic.\end{Desc}
+\begin{Desc}
+\item[Author: ]\par
+Jos\'{e} Ram\'{o}n Valverde Carrillo ({\tt jrvalverde@acm.org})\end{Desc}
+\begin{Desc}
+\item[Version: ]\par
+3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+23 - february - 2004 v3.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+11 - february - 2004 v2.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+1 - october - 1988 Last modification of v1.0\end{Desc}
+COPYRIGHT: 169 Yo\-Ego. Since I have no cash, I can't register this (nor do I believe I should). So this module is left in the PUBLIC DOMAIN. It is furthermore forbidden its use for commercial purposes unless I get a share on the profits. I say. Yo\-Ego.
+
+\$Id\$ \$Log\$
+
+
+
+Definition in file {\bf mat\_\-ops.c}.

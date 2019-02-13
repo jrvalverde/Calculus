@@ -1,0 +1,660 @@
+\section{matrix.h File Reference}
+\label{matrix_8h}\index{matrix.h@{matrix.h}}
+2D matrix manipulation functions 
+
+
+
+
+This graph shows which files directly or indirectly include this file:\subsection*{Data Structures}
+\begin{CompactItemize}
+\item 
+struct {\bf matrix}
+\begin{CompactList}\small\item\em Implementation of a 2D-matrix.\item\end{CompactList}\end{CompactItemize}
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define {\bf MAT\_\-PARANOIA}
+\item 
+\#define {\bf MAT\_\-NOMEMORY}\ (-1)
+\item 
+\#define {\bf MAT\_\-BOUNDSCHECK}\ (-2)
+\item 
+\#define {\bf MAT\_\-SINGULAR}\ (-3)
+\item 
+\#define {\bf MAT\_\-NOTSQUARE}\ (-3)
+\end{CompactItemize}
+\subsection*{Typedefs}
+\begin{CompactItemize}
+\item 
+typedef double {\bf real}
+\item 
+typedef matrix $\ast$ {\bf matrix}
+\begin{CompactList}\small\item\em Implementation of a 2D-matrix.\item\end{CompactList}\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+{\bf status} {\bf mat\_\-alloc} ({\bf matrix} $\ast$pmat, int rows, int cols)
+\item 
+{\bf status} {\bf mat\_\-free} ({\bf matrix} mat)
+\item 
+int {\bf mat\_\-rows} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em return number of rows of a matrix\item\end{CompactList}\item 
+int {\bf mat\_\-cols} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em return number of columns of a matrix\item\end{CompactList}\item 
+{\bf real} $\ast$$\ast$ {\bf mat\_\-values} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em return a (handy) pointer to the table of values of a matrix\item\end{CompactList}\item 
+{\bf real} $\ast$ {\bf mat\_\-row} ({\bf matrix} mat, int row\_\-number)
+\begin{CompactList}\small\item\em return a row of a matrix\item\end{CompactList}\item 
+{\bf real} {\bf mat\_\-element} ({\bf matrix} mat, int row, int col)
+\item 
+{\bf status} {\bf mat\_\-set} ({\bf matrix} mat, int row, int col, {\bf real} value)
+\item 
+{\bf status} {\bf mat\_\-init} ({\bf matrix} mat, {\bf real} value)
+\begin{CompactList}\small\item\em Set all matrix elements to the specified value.\item\end{CompactList}\item 
+{\bf status} {\bf mat\_\-identity} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em Compute the identity matrix of dimension [n] x [n]: Every element ij / i $<$$>$ j is 0, every ij / i = j is 1.\item\end{CompactList}\item 
+{\bf status} {\bf mat\_\-assign} ({\bf matrix} dest, {\bf matrix} orig)
+\begin{CompactList}\small\item\em MAT dest = orig.\item\end{CompactList}\item 
+{\bf status} {\bf mat\_\-transpose} ({\bf matrix} trn, {\bf matrix} mat)
+\begin{CompactList}\small\item\em MAT trn = TRN(mat) Compute the transpose of a matrix.\item\end{CompactList}\item 
+{\bf status} {\bf mat\_\-sum} ({\bf matrix} result, {\bf matrix} mat1, {\bf matrix} mat2)
+\begin{CompactList}\small\item\em MAT C = A + B;.\item\end{CompactList}\item 
+{\bf status} {\bf mat\_\-substract} ({\bf matrix} result, {\bf matrix} mat1, {\bf matrix} mat2)
+\begin{CompactList}\small\item\em MAT res = mat1 - mat2.\item\end{CompactList}\item 
+{\bf status} {\bf mat\_\-multiply} ({\bf matrix} prod, {\bf matrix} fact1, {\bf matrix} fact2)
+\begin{CompactList}\small\item\em MAT prod[m][p] = fact1[m][n] $\ast$ fact2[n][p]; Compute the product of two matrices.\item\end{CompactList}\item 
+{\bf status} {\bf mat\_\-scalar\_\-product} ({\bf matrix} scprod, {\bf matrix} mat, {\bf real} lambda)
+\begin{CompactList}\small\item\em compute the scalar product\item\end{CompactList}\item 
+{\bf boolean} {\bf mat\_\-is\_\-square} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em query if a matrix is square\item\end{CompactList}\item 
+{\bf boolean} {\bf mat\_\-is\_\-symmetric} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em check if a matrix is symmetric\item\end{CompactList}\item 
+{\bf boolean} {\bf mat\_\-is\_\-identity} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em query if this is an identity matrix\item\end{CompactList}\item 
+{\bf boolean} {\bf mat\_\-is\_\-null} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em query if a matrix is null\item\end{CompactList}\item 
+{\bf status} {\bf mat\_\-invert} ({\bf matrix} B, {\bf matrix} C)
+\begin{CompactList}\small\item\em MAT B = INV ( C );.\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+2D matrix manipulation functions
+
+
+
+Generic implementation of bidimensional matrix calculus. It contains functions to allocate memory space and, by this time, elementary matrix calculus.
+
+All matrix operations should be done using the interfaces provided. If efficiency is a must, you may try defining MAT\_\-OPTIMIZE and see if the alternative code provided with its shortcuts may increase speed.
+
+In general, and during development in particular, you are advised to ALWAYS define MAT\_\-PARANOIA to enable bounds checking. This may slow down some operations, most notably accessing individual matrix elements but will reduce the  possibility of errors passing unnoticed. Only if you are really confident that you don't have errors in your code should you venture to risk undefining MAT\_\-PARANOIA.
+
+\begin{Desc}
+\item[Precondition: ]\par
+stdio.h \par
+math.h \par
+stdlib.h \par
+bits/nan.h \par
+{\bf portable.h}\end{Desc}
+\begin{Desc}
+\item[Note: ]\par
+Estoy hasta los cojones. Today (1 - oct - 1988) is my father's birthday and here I am like a dumb loser.\end{Desc}
+\begin{Desc}
+\item[{\bf Bug: }]\par
+There must be some bug in the matrix allocation code for the optimized implementation.\end{Desc}
+
+
+\begin{Desc}
+\item[{\bf Todo: }]\par
+Debugging the MAT\_\-OPTIMIZE implementation 
+
+I intend to add functions for the solution of systems of equations, manipulation of eigenvalues and eigenvectors.\end{Desc}
+
+
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-test.c} Is an auxiliary module with the test code of these functions used to debug this module (last time everything went OK).\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-housekeep.c} To learn how to create/destroy matrices.\end{Desc}
+\begin{Desc}
+\item[Author: ]\par
+Jos\'{e} Ram\'{o}n Valverde Carrillo.\end{Desc}
+\begin{Desc}
+\item[Version: ]\par
+2.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+11 - february - 2004 v2.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+1 - october - 1988 Last modification of v1.0\end{Desc}
+COPYRIGHT: 169 Yo\-Ego. Since I have no cash, I can't register this (nor do I believe I should). So this module is left in the PUBLIC DOMAIN. It is furthermore forbidden its use for commercial purposes unless I get a share on the profits. I say. Yo\-Ego.
+
+\begin{Desc}
+\item[Id: ]\par
+ matrix.h,v 1.1 2004/03/05 18:26:06 jr Exp \end{Desc}
+ \begin{Desc}
+\item[Log: ]\par
+ matrix.h,v \end{Desc}
+ Revision 1.1 2004/03/05 18:26:06 jr Initial revision
+
+
+
+Definition in file {\bf matrix.h}.
+
+\subsection{Define Documentation}
+\index{matrix.h@{matrix.h}!MAT_BOUNDSCHECK@{MAT\_\-BOUNDSCHECK}}
+\index{MAT_BOUNDSCHECK@{MAT\_\-BOUNDSCHECK}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MAT\_\-BOUNDSCHECK\ (-2)}\label{matrix_8h_a2}
+
+
+ERROR: during bounds checking 
+
+Definition at line 113 of file matrix.h.
+
+Referenced by mat\_\-alloc(), mat\_\-assign(), mat\_\-multiply(), mat\_\-set(), mat\_\-substract(), mat\_\-sum(), and mat\_\-transpose().\index{matrix.h@{matrix.h}!MAT_NOMEMORY@{MAT\_\-NOMEMORY}}
+\index{MAT_NOMEMORY@{MAT\_\-NOMEMORY}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MAT\_\-NOMEMORY\ (-1)}\label{matrix_8h_a1}
+
+
+ERROR: not enough memory 
+
+Definition at line 112 of file matrix.h.
+
+Referenced by mat\_\-alloc(), and mat\_\-invert().\index{matrix.h@{matrix.h}!MAT_NOTSQUARE@{MAT\_\-NOTSQUARE}}
+\index{MAT_NOTSQUARE@{MAT\_\-NOTSQUARE}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MAT\_\-NOTSQUARE\ (-3)}\label{matrix_8h_a4}
+
+
+ERROR: not a square marix 
+
+Definition at line 115 of file matrix.h.
+
+Referenced by mat\_\-identity().\index{matrix.h@{matrix.h}!MAT_PARANOIA@{MAT\_\-PARANOIA}}
+\index{MAT_PARANOIA@{MAT\_\-PARANOIA}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MAT\_\-PARANOIA}\label{matrix_8h_a0}
+
+
+enable additional checking at the cost of efficiency 
+
+Definition at line 76 of file matrix.h.\index{matrix.h@{matrix.h}!MAT_SINGULAR@{MAT\_\-SINGULAR}}
+\index{MAT_SINGULAR@{MAT\_\-SINGULAR}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MAT\_\-SINGULAR\ (-3)}\label{matrix_8h_a3}
+
+
+ERROR: matrix is singular 
+
+Definition at line 114 of file matrix.h.
+
+Referenced by mat\_\-invert().
+
+\subsection{Typedef Documentation}
+\index{matrix.h@{matrix.h}!matrix@{matrix}}
+\index{matrix@{matrix}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}struct matrix matrix}\label{matrix_8h_a6}
+
+
+Implementation of a 2D-matrix.
+
+A matrix A is a set of values grouped as a table arranged by rows and columns: a matrix m x n (rows x columns) is \[ A = \pmatrix { a_{11} & a_{12} & \cdots & a_{1n} \cr a_{21} & a_{22} & \cdots & a_{2n} \cr \vdots & \vdots & \ddots & \vdots \cr a_{m1} & a_{m2} & \cdots & a_{mn} \cr } \] where a$_{\mbox{ij}}$ are the elements of A (i = 1..m, j = 1..n) Vectors are matrices with only one row or column: they only need one subindex.
+
+Sometimes it may be convenient to consider special rows or columns:
+
+R$_{\mbox{i}}$(A) -- row i.
+
+C$_{\mbox{j}}$(A) -- row j.
+
+\begin{Desc}
+\item[Note: ]\par
+Please, note that all subindexes are offset at one (1) \end{Desc}
+\index{matrix.h@{matrix.h}!real@{real}}
+\index{real@{real}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}typedef double real}\label{matrix_8h_a5}
+
+
+
+
+Definition at line 78 of file matrix.h.
+
+Referenced by mat\_\-alloc(), mat\_\-assign(), mat\_\-element(), mat\_\-free(), mat\_\-identity(), mat\_\-init(), mat\_\-invert(), mat\_\-is\_\-null(), mat\_\-is\_\-symmetric(), mat\_\-multiply(), mat\_\-row(), mat\_\-scalar\_\-product(), mat\_\-set(), mat\_\-substract(), mat\_\-sum(), mat\_\-transpose(), and mat\_\-values().
+
+\subsection{Function Documentation}
+\index{matrix.h@{matrix.h}!mat_alloc@{mat\_\-alloc}}
+\index{mat_alloc@{mat\_\-alloc}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-alloc ({\bf matrix} $\ast$ {\em pmat}, int {\em rows}, int {\em cols})}\label{matrix_8h_a7}
+
+
+
+
+Definition at line 102 of file mat\_\-housekeep.c.
+
+References matrix::cols, free, malloc, MAT\_\-BOUNDSCHECK, MAT\_\-NOMEMORY, real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-invert().\index{matrix.h@{matrix.h}!mat_assign@{mat\_\-assign}}
+\index{mat_assign@{mat\_\-assign}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-assign ({\bf matrix} {\em dest}, {\bf matrix} {\em orig})}\label{matrix_8h_a17}
+
+
+MAT dest = orig.
+
+Transfer ([m] x [n]) elements from 2 to 1.
+
+Assigns the values of one matrix to another. Both matrices must have the same dimensions, otherwise an error result will occur.
+
+If the origin matrix is NULL, then the destination matrix will be set to the null matrix (i.e. all of its elements initialized to zero).\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+dest}]the destination matrix \item[{\em 
+orig}]the origin matrix\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 84 of file mat\_\-ops.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, mat\_\-init(), real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-invert().\index{matrix.h@{matrix.h}!mat_cols@{mat\_\-cols}}
+\index{mat_cols@{mat\_\-cols}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int mat\_\-cols ({\bf matrix} {\em mat})}\label{matrix_8h_a10}
+
+
+return number of columns of a matrix
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by {\bf mat\_\-alloc()} {\rm (p.\,\pageref{matrix_8h_a7})} whose column dimension we want to know \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+the number of columns of the matrix \end{Desc}
+
+
+Definition at line 100 of file mat\_\-access.c.
+
+References matrix::cols.\index{matrix.h@{matrix.h}!mat_element@{mat\_\-element}}
+\index{mat_element@{mat\_\-element}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf real} mat\_\-element ({\bf matrix} {\em mat}, int {\em row}, int {\em col})}\label{matrix_8h_a13}
+
+
+
+
+Definition at line 152 of file mat\_\-access.c.
+
+References matrix::cols, real, matrix::rows, and matrix::values.\index{matrix.h@{matrix.h}!mat_free@{mat\_\-free}}
+\index{mat_free@{mat\_\-free}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-free ({\bf matrix} {\em mat})}\label{matrix_8h_a8}
+
+
+
+
+Definition at line 188 of file mat\_\-housekeep.c.
+
+References free, real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-invert().\index{matrix.h@{matrix.h}!mat_identity@{mat\_\-identity}}
+\index{mat_identity@{mat\_\-identity}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-identity ({\bf matrix} {\em mat})}\label{matrix_8h_a16}
+
+
+Compute the identity matrix of dimension [n] x [n]: Every element ij / i $<$$>$ j is 0, every ij / i = j is 1.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by {\bf mat\_\-alloc()} {\rm (p.\,\pageref{matrix_8h_a7})} that will be set to the identity matrix\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 156 of file mat\_\-init.c.
+
+References matrix::cols, MAT\_\-NOTSQUARE, real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-invert().\index{matrix.h@{matrix.h}!mat_init@{mat\_\-init}}
+\index{mat_init@{mat\_\-init}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-init ({\bf matrix} {\em mat}, {\bf real} {\em value})}\label{matrix_8h_a15}
+
+
+Set all matrix elements to the specified value.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by {\bf mat\_\-alloc()} {\rm (p.\,\pageref{matrix_8h_a7})} whose values will be all set to the real value specified \item[{\em 
+value}]the value to assign to all matrix elements\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 119 of file mat\_\-init.c.
+
+References matrix::cols, real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-assign().\index{matrix.h@{matrix.h}!mat_invert@{mat\_\-invert}}
+\index{mat_invert@{mat\_\-invert}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-invert ({\bf matrix} {\em B}, {\bf matrix} {\em C})}\label{matrix_8h_a27}
+
+
+MAT B = INV ( C );.
+
+Computes the inverted matrix of C, which is a square matrix n x n and stores the result on B. The algorithm employed is a modification of Gauss' method. This is probably not the best (nor is it the nicest implementation), but for the moment will do.
+
+Given the identity matrix I$_{\mbox{nn}}$, we may think of another such that
+
+A B = B A = I =$>$ B = A$^{\mbox{-1}}$
+
+A A$^{\mbox{-1}}$ = I = A$^{\mbox{-1}}$ A
+
+Using the cofactors of A$_{\mbox{ij}}$ we may compute
+
+A$^{\mbox{-1}}$ = 1 / $|$A$|$ 183 adj(A)
+
+(calculating through the adjunct matrix). If $|$A$|$ = 0 then it is not defined and A is SINGULAR.
+
+The inverse of a matrix A, if it exists, is unique and may be found: We first form for A$_{\mbox{nn}}$ the matrix A$_{\mbox{n x 2n}}$ \[ (A, I) = \pmatrix { a_{11} & a_{12} & \cdots & a_{1n} & 1 & 0 & \cdots & 0 \cr a_{21} & a_{22} & \cdots & a_{2n} & 0 & 1 & \cdots & 0 \cr \vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \ddots & 0 \cr a_{n1} & a_{n2} & \cdots & a_{nn} & 0 & 0 & \cdots & 1 \cr } \] That is, the left half is A and the right half I, the identity matrix. Using a modified Gauss method we transform the former matrix into \[ (I, B) = \pmatrix { 1 & 0 & \cdots & 0 & b_{11} & b_{12} & \cdots & b_{1n}\cr 0 & 1 & \cdots & 0 & b_{21} & b_{22} & \cdots & b_{2n}\cr \vdots & \vdots & \ddots & 0 & \vdots & \vdots & \ddots & \vdots\cr 0 & 0 & \cdots & 1 & b_{n1} & b_{n2} & \cdots & b_{nn}\cr } \] Now the left half is I and the right half, B is the inverse of A.
+
+To avoid changing matrix C we get first a working copy that we store in matrix A, whose space is reserved ex-profeso and is freed upon termination.
+
+@callgraph 
+
+Definition at line 224 of file mat\_\-ops.c.
+
+References FALSE, mat\_\-alloc(), mat\_\-assign(), mat\_\-free(), mat\_\-identity(), MAT\_\-NOMEMORY, MAT\_\-SINGULAR, real, matrix::rows, status, TRUE, and matrix::values.\index{matrix.h@{matrix.h}!mat_is_identity@{mat\_\-is\_\-identity}}
+\index{mat_is_identity@{mat\_\-is\_\-identity}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf boolean} mat\_\-is\_\-identity ({\bf matrix} {\em mat})}\label{matrix_8h_a25}
+
+
+query if this is an identity matrix
+
+Return if the matrix is an identity matrix. The matrix must be a square matrix and have all elements in the main diagonal set to  one, and all off-diagonal elements set to zero.
+
+An identity matrix of order n, I$_{\mbox{nn}}$ verifies
+
+A$_{\mbox{mn}}$ I$_{\mbox{nn}}$ = A$_{\mbox{mn}}$
+
+I$_{\mbox{nn}}$ B$_{\mbox{np}}$ = B$_{\mbox{np}}$\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix to verify\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+TRUE if the matrix is an identity matrix. \end{Desc}
+
+
+Definition at line 149 of file mat\_\-properties.c.
+
+References matrix::cols, FALSE, matrix::rows, TRUE, and matrix::values.\index{matrix.h@{matrix.h}!mat_is_null@{mat\_\-is\_\-null}}
+\index{mat_is_null@{mat\_\-is\_\-null}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf boolean} mat\_\-is\_\-null ({\bf matrix} {\em mat})}\label{matrix_8h_a26}
+
+
+query if a matrix is null
+
+Find out if we are dealing with the null matrix. A null matrix has all of its elements set to zero.\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix to verify\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+TRUE if the matrix is a null matrix. \end{Desc}
+
+
+Definition at line 178 of file mat\_\-properties.c.
+
+References matrix::cols, FALSE, real, matrix::rows, TRUE, and matrix::values.\index{matrix.h@{matrix.h}!mat_is_square@{mat\_\-is\_\-square}}
+\index{mat_is_square@{mat\_\-is\_\-square}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf boolean} mat\_\-is\_\-square ({\bf matrix} {\em mat})}\label{matrix_8h_a23}
+
+
+query if a matrix is square
+
+Verify if both dimensions of a matrix are the same (i.e. it is square)\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix to verify\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+TRUE if the matrix is square, false otherwise \end{Desc}
+
+
+Definition at line 79 of file mat\_\-properties.c.
+
+References matrix::cols, and matrix::rows.\index{matrix.h@{matrix.h}!mat_is_symmetric@{mat\_\-is\_\-symmetric}}
+\index{mat_is_symmetric@{mat\_\-is\_\-symmetric}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf boolean} mat\_\-is\_\-symmetric ({\bf matrix} {\em mat})}\label{matrix_8h_a24}
+
+
+check if a matrix is symmetric
+
+Check if a matrix is symmetric. A symmetric matric has all its elements symmetric with respect to the main diagonal (a$_{\mbox{ij}}$ = a$_{\mbox{ji}}$): A=A'
+
+This is useful for handling quadratic forms: Given A$_{\mbox{mn}}$ and X$_{\mbox{n1}}$ then \[ X^T A X = \sum_{i=1}^n \sum{j=1}^n a_{ij} x{i} x{j} \] and conversely, given a quadratic form, it may be converted to matrix form, but there are many ways to choose a matrix A. One of them is to select A a symmetric matrix: it is then easier to select its values.\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix to verify\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+TRUE if the matrix is symmetric, FALSE otherwise. \end{Desc}
+
+
+Definition at line 101 of file mat\_\-properties.c.
+
+References matrix::cols, FALSE, real, matrix::rows, TRUE, and matrix::values.\index{matrix.h@{matrix.h}!mat_multiply@{mat\_\-multiply}}
+\index{mat_multiply@{mat\_\-multiply}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-multiply ({\bf matrix} {\em prod}, {\bf matrix} {\em fact1}, {\bf matrix} {\em fact2})}\label{matrix_8h_a21}
+
+
+MAT prod[m][p] = fact1[m][n] $\ast$ fact2[n][p]; Compute the product of two matrices.
+
+Compute the product of two matrices and store result in another one. The number of columns in the first factor matrix must be equal to the number of rows in the second factor matrix. The resulting product  matrix will have same number of rows as first factor and same number of columns as second factor.
+
+Let A$_{\mbox{mn}}$ and B$_{\mbox{np}}$: \[ A · B = C / A_{mn} B_{np} = C_{mp} / c_{ij} = \sum_{k=1}^n a_{ik} b_{kj} (i = 1 \ldots m; j = 1 \ldots p) \]
+
+If p == 1 (i. e. B is a vector with a single column) then A 183 x for A$_{\mbox{mn}}$ and x$_{\mbox{n1}}$ is \[ Y_{m1} / y_i = \sum_{k=1}^n a_{ik} x_k (i = 1 \ldots m) \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+prod}]a matrix to store the resulting product \item[{\em 
+fact1}]first factor to multiply \item[{\em 
+fact2}]second factor matrix to multiply\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 212 of file mat\_\-arith.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.\index{matrix.h@{matrix.h}!mat_row@{mat\_\-row}}
+\index{mat_row@{mat\_\-row}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf real}$\ast$ mat\_\-row ({\bf matrix} {\em mat}, int {\em row\_\-number})}\label{matrix_8h_a12}
+
+
+return a row of a matrix
+
+This function returns a pointer to the values of the specified row R$_{\mbox{i}}$(mat)\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by mat\_\-alloc \item[{\em 
+row\_\-number}]the index of the row to return \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+a pointer to an array [1..dim] containing the row values \end{Desc}
+
+
+Definition at line 128 of file mat\_\-access.c.
+
+References real, matrix::rows, and matrix::values.\index{matrix.h@{matrix.h}!mat_rows@{mat\_\-rows}}
+\index{mat_rows@{mat\_\-rows}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int mat\_\-rows ({\bf matrix} {\em mat})}\label{matrix_8h_a9}
+
+
+return number of rows of a matrix
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by {\bf mat\_\-alloc()} {\rm (p.\,\pageref{matrix_8h_a7})} whose row order we want to know \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+the number of rows of the matrix \end{Desc}
+
+
+Definition at line 89 of file mat\_\-access.c.
+
+References matrix::rows.\index{matrix.h@{matrix.h}!mat_scalar_product@{mat\_\-scalar\_\-product}}
+\index{mat_scalar_product@{mat\_\-scalar\_\-product}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-scalar\_\-product ({\bf matrix} {\em scprod}, {\bf matrix} {\em mat}, {\bf real} {\em lambda})}\label{matrix_8h_a22}
+
+
+compute the scalar product
+
+Compute the product of a matrix by a scalar quantity and store the result in another matrix: \[ B = \lambda \cdot A (\lambda = constant) \]\[ b_{ij} = \lambda \cdot a_{ij} (i = 1 \ldots m, j = 1 \ldots n) \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+scprod}]the matrix to store the result \item[{\em 
+mat}]the matrix to multiply \item[{\em 
+lambda}]the scalar operand\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 256 of file mat\_\-arith.c.
+
+References matrix::cols, real, matrix::rows, status, and matrix::values.\index{matrix.h@{matrix.h}!mat_set@{mat\_\-set}}
+\index{mat_set@{mat\_\-set}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-set ({\bf matrix} {\em mat}, int {\em row}, int {\em col}, {\bf real} {\em value})}\label{matrix_8h_a14}
+
+
+
+
+Definition at line 96 of file mat\_\-init.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.\index{matrix.h@{matrix.h}!mat_substract@{mat\_\-substract}}
+\index{mat_substract@{mat\_\-substract}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-substract ({\bf matrix} {\em result}, {\bf matrix} {\em mat1}, {\bf matrix} {\em mat2})}\label{matrix_8h_a20}
+
+
+MAT res = mat1 - mat2.
+
+Substracts mat2 from mat1 and stores result in res.
+
+Subtract one matrix from another and store the result in another one. All three matrices must have the same dimensions:
+
+\[ A_{mn} - B_{mn} = E_{mn} / e_{ij} = a_{ij} - b_{ij} (i = 1 \ldots m; j = 1 \ldots n) \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+result}]The resulting substraction matrix \item[{\em 
+mat1}]Minuend matrix \item[{\em 
+mat2}]Substraend matrix\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 148 of file mat\_\-arith.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.\index{matrix.h@{matrix.h}!mat_sum@{mat\_\-sum}}
+\index{mat_sum@{mat\_\-sum}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-sum ({\bf matrix} {\em result}, {\bf matrix} {\em mat1}, {\bf matrix} {\em mat2})}\label{matrix_8h_a19}
+
+
+MAT C = A + B;.
+
+sum two matrices and store result in another.
+
+function mat\_\-sum adds two matrices and stores the result in a separate one. Both matrices must have the same number of rows and columns:
+
+\[ \sum A_{mn} + B_{mn} = C_{mn} / c_{ij} = a_{ij} + b_{ij} (i = 1 \ldots m, j = 1 \ldots n) \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+result}]a matrix to store the sum \item[{\em 
+mat1}]sumand \item[{\em 
+mat2}]sumand\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 91 of file mat\_\-arith.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.\index{matrix.h@{matrix.h}!mat_transpose@{mat\_\-transpose}}
+\index{mat_transpose@{mat\_\-transpose}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf status} mat\_\-transpose ({\bf matrix} {\em trn}, {\bf matrix} {\em mat})}\label{matrix_8h_a18}
+
+
+MAT trn = TRN(mat) Compute the transpose of a matrix.
+
+The transpose A$^{\mbox{T}}$ of a matrix A is A' = A$^{\mbox{T}}$ / row A' = col A =$>$
+
+(A)$_{\mbox{ij}}$ = (A$^{\mbox{T}}$)$_{\mbox{ji}}$
+
+Thus, if A$_{\mbox{m183n}}$, then A'$_{\mbox{n.m}}$ =$>$
+
+If A 183 B = C -$>$ C' = A' 183 B'
+
+We may therefore describe a column vector as a row vector
+
+\[ \pmatrix { x_1 \cr x_2 \cr \cdots \cr x_{n-1} \cr x_n \cr } = \pmatrix {x_1 & x_2 & \cdots & x_n \cr } \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+trn}]a matrix where we will store the transpose \item[{\em 
+mat}]the matrix whose transpose we want to take \end{description}
+\end{Desc}
+
+
+Definition at line 147 of file mat\_\-ops.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.\index{matrix.h@{matrix.h}!mat_values@{mat\_\-values}}
+\index{mat_values@{mat\_\-values}!matrix.h@{matrix.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf real}$\ast$$\ast$ mat\_\-values ({\bf matrix} {\em mat})}\label{matrix_8h_a11}
+
+
+return a (handy) pointer to the table of values of a matrix
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix whose value table we want to access \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+a 2D table with the values of the matrix arranged by rows and columns. \end{Desc}
+
+
+Definition at line 113 of file mat\_\-access.c.
+
+References real, and matrix::values.

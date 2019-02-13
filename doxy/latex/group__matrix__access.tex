@@ -1,0 +1,125 @@
+\section{Matrix\_\-access}
+\label{group__matrix__access}\index{Matrix_access@{Matrix\_\-access}}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public int {\bf mat\_\-rows} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em return number of rows of a matrix\item\end{CompactList}\item 
+public int {\bf mat\_\-cols} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em return number of columns of a matrix\item\end{CompactList}\item 
+public {\bf real} $\ast$$\ast$ {\bf mat\_\-values} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em return a (handy) pointer to the table of values of a matrix\item\end{CompactList}\item 
+public {\bf real} $\ast$ {\bf mat\_\-row} ({\bf matrix} mat, int row\_\-number)
+\begin{CompactList}\small\item\em return a row of a matrix\item\end{CompactList}\item 
+public {\bf real} {\bf mat\_\-element} ({\bf matrix} mat, int row, int col)
+\begin{CompactList}\small\item\em return value of matrix element mat[row][col]\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{Matrix_access@{Matrix\_\-access}!mat_cols@{mat\_\-cols}}
+\index{mat_cols@{mat\_\-cols}!Matrix_access@{Matrix\_\-access}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public int mat\_\-cols ({\bf matrix} {\em mat})}\label{group__matrix__access_a1}
+
+
+return number of columns of a matrix
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by {\bf mat\_\-alloc()} {\rm (p.\,\pageref{group__matrix__housekeeping_a0})} whose column dimension we want to know \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+the number of columns of the matrix \end{Desc}
+
+
+Definition at line 100 of file mat\_\-access.c.
+
+References matrix::cols.\index{Matrix_access@{Matrix\_\-access}!mat_element@{mat\_\-element}}
+\index{mat_element@{mat\_\-element}!Matrix_access@{Matrix\_\-access}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf real} mat\_\-element ({\bf matrix} {\em mat}, int {\em row}, int {\em col})}\label{group__matrix__access_a4}
+
+
+return value of matrix element mat[row][col]
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix whose value we want to set \item[{\em 
+row}]value row offset \item[{\em 
+col}]value column offset\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+the value of the element.\end{Desc}
+\begin{Desc}
+\item[Note: ]\par
+if MAT\_\-PARANOIA is defined, extra bound checking is performed and IEEE Na\-N returned on error. \end{Desc}
+
+
+Definition at line 152 of file mat\_\-access.c.
+
+References matrix::cols, real, matrix::rows, and matrix::values.\index{Matrix_access@{Matrix\_\-access}!mat_row@{mat\_\-row}}
+\index{mat_row@{mat\_\-row}!Matrix_access@{Matrix\_\-access}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf real}$\ast$ mat\_\-row ({\bf matrix} {\em mat}, int {\em row\_\-number})}\label{group__matrix__access_a3}
+
+
+return a row of a matrix
+
+This function returns a pointer to the values of the specified row R$_{\mbox{i}}$(mat)\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by mat\_\-alloc \item[{\em 
+row\_\-number}]the index of the row to return \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+a pointer to an array [1..dim] containing the row values \end{Desc}
+
+
+Definition at line 128 of file mat\_\-access.c.
+
+References real, matrix::rows, and matrix::values.\index{Matrix_access@{Matrix\_\-access}!mat_rows@{mat\_\-rows}}
+\index{mat_rows@{mat\_\-rows}!Matrix_access@{Matrix\_\-access}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public int mat\_\-rows ({\bf matrix} {\em mat})}\label{group__matrix__access_a0}
+
+
+return number of rows of a matrix
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]a matrix allocated by {\bf mat\_\-alloc()} {\rm (p.\,\pageref{group__matrix__housekeeping_a0})} whose row order we want to know \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+the number of rows of the matrix \end{Desc}
+
+
+Definition at line 89 of file mat\_\-access.c.
+
+References matrix::rows.\index{Matrix_access@{Matrix\_\-access}!mat_values@{mat\_\-values}}
+\index{mat_values@{mat\_\-values}!Matrix_access@{Matrix\_\-access}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf real}$\ast$$\ast$ mat\_\-values ({\bf matrix} {\em mat})}\label{group__matrix__access_a2}
+
+
+return a (handy) pointer to the table of values of a matrix
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix whose value table we want to access \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+a 2D table with the values of the matrix arranged by rows and columns. \end{Desc}
+
+
+Definition at line 113 of file mat\_\-access.c.
+
+References real, and matrix::values.

@@ -1,0 +1,16 @@
+digraph inheritance
+{
+  Node16 [shape="box",label="mat_housekeep.c",fontsize=10,height=0.2,width=0.4,color="black",style="filled" fontcolor="white"];
+  Node17 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid"];
+  Node17 [shape="box",label="stdio.h",fontsize=10,height=0.2,width=0.4,color="grey75"];
+  Node18 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid"];
+  Node18 [shape="box",label="math.h",fontsize=10,height=0.2,width=0.4,color="grey75"];
+  Node19 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid"];
+  Node19 [shape="box",label="stdlib.h",fontsize=10,height=0.2,width=0.4,color="grey75"];
+  Node20 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid"];
+  Node20 [shape="box",label="bits/nan.h",fontsize=10,height=0.2,width=0.4,color="grey75"];
+  Node21 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid"];
+  Node21 [shape="box",label="portable.h",fontsize=10,height=0.2,width=0.4,color="black",URL="$portable_8h.html"];
+  Node22 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid"];
+  Node22 [shape="box",label="matrix.h",fontsize=10,height=0.2,width=0.4,color="black",URL="$matrix_8h.html"];
+}

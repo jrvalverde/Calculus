@@ -1,0 +1,75 @@
+\section{mat\_\-properties.c File Reference}
+\label{mat__properties_8c}\index{mat_properties.c@{mat\_\-properties.c}}
+functions to query 2D matrix properties 
+
+
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$math.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$bits/nan.h$>$}\par
+{\tt \#include \char`\"{}portable.h\char`\"{}}\par
+{\tt \#include \char`\"{}matrix.h\char`\"{}}\par
+
+
+Include dependency graph for mat\_\-properties.c:\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf boolean} {\bf mat\_\-is\_\-square} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em query if a matrix is square\item\end{CompactList}\item 
+public {\bf boolean} {\bf mat\_\-is\_\-symmetric} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em check if a matrix is symmetric\item\end{CompactList}\item 
+public {\bf boolean} {\bf mat\_\-is\_\-identity} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em query if this is an identity matrix\item\end{CompactList}\item 
+public {\bf boolean} {\bf mat\_\-is\_\-null} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em query if a matrix is null\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+functions to query 2D matrix properties
+
+
+
+When using 2D matrices it is often useful to find about the properties of a matrix before performing some operations on it, either to be able to select a better algorithm, to avoid problems or for any other reason.
+
+The functions in this module allow you to find out if a given matrix has the queried characteristic.
+
+\begin{Desc}
+\item[Note: ]\par
+The results found might be cached in specific fields of the matrix structure, with a .dirty field to signal when a given operation may have changed the properties of a matrix. The general usage of matrices should be investigated to decide if this approach is worth the trouble.\end{Desc}
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf portable.h}\end{Desc}
+\begin{Desc}
+\item[Precondition: ]\par
+{\bf matrix.h}\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf matrix.h} for a general introduction to matrices\end{Desc}
+\begin{Desc}
+\item[See also: ]\par
+{\bf mat\_\-test.c} Is an auxiliary module with the test code of these functions used to debug this module (last time everything went OK).\end{Desc}
+\begin{Desc}
+\item[Author: ]\par
+Jos\'{e} Ram\'{o}n Valverde Carrillo.\end{Desc}
+\begin{Desc}
+\item[Version: ]\par
+2.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+11 - february - 2004 v2.0\end{Desc}
+\begin{Desc}
+\item[Date: ]\par
+1 - october - 1988 Last modification of v1.0\end{Desc}
+COPYRIGHT: 169 Yo\-Ego. Since I have no cash, I can't register this (nor do I believe I should). So this module is left in the PUBLIC DOMAIN. It is furthermore forbidden its use for commercial purposes unless I get a share on the profits. I say. Yo\-Ego.
+
+\begin{Desc}
+\item[Id: ]\par
+ mat.c,v 1.1 2004/02/22 21:13:12 jr Exp jr \end{Desc}
+ \begin{Desc}
+\item[Log: ]\par
+ mat.c,v \end{Desc}
+ Revision 1.1 2004/02/22 21:13:12 jr Initial revision
+
+
+
+Definition in file {\bf mat\_\-properties.c}.

@@ -1,0 +1,62 @@
+\section{Matrix\_\-housekeeping}
+\label{group__matrix__housekeeping}\index{Matrix_housekeeping@{Matrix\_\-housekeeping}}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf status} {\bf mat\_\-alloc} ({\bf matrix} $\ast$pmat, int rows, int cols)
+\begin{CompactList}\small\item\em Allocate a new, uninitialized 2-D matrix.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-free} ({\bf matrix} mat)
+\begin{CompactList}\small\item\em free a 2D-matrix\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{Matrix_housekeeping@{Matrix\_\-housekeeping}!mat_alloc@{mat\_\-alloc}}
+\index{mat_alloc@{mat\_\-alloc}!Matrix_housekeeping@{Matrix\_\-housekeeping}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-alloc ({\bf matrix} $\ast$ {\em pmat}, int {\em rows}, int {\em cols})}\label{group__matrix__housekeeping_a0}
+
+
+Allocate a new, uninitialized 2-D matrix.
+
+Allocates memory space for a bidimensional matrix of 1..rows x 1..cols elements\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+pmat}]address of the matrix to allocate \item[{\em 
+rows}]the number of rows in the 2D-matrix \item[{\em 
+cols}]the number of columns in the 2D-matrix\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+success if all went well, an error code otherwise\end{Desc}
+\begin{Desc}
+\item[Note: ]\par
+if MAT\_\-PARANOIA has been defined, parameter checking is performed \end{Desc}
+
+
+Definition at line 102 of file mat\_\-housekeep.c.
+
+References matrix::cols, free, malloc, MAT\_\-BOUNDSCHECK, MAT\_\-NOMEMORY, real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-invert().\index{Matrix_housekeeping@{Matrix\_\-housekeeping}!mat_free@{mat\_\-free}}
+\index{mat_free@{mat\_\-free}!Matrix_housekeeping@{Matrix\_\-housekeeping}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public void mat\_\-free ({\bf matrix} {\em mat})}\label{group__matrix__housekeeping_a1}
+
+
+free a 2D-matrix
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+mat}]the matrix to be freed, must have been allocated by {\bf mat\_\-alloc()} {\rm (p.\,\pageref{group__matrix__housekeeping_a0})}\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well \end{Desc}
+
+
+Definition at line 188 of file mat\_\-housekeep.c.
+
+References free, real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-invert().

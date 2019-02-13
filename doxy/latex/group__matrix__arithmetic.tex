@@ -1,0 +1,117 @@
+\section{Matrix\_\-arithmetic}
+\label{group__matrix__arithmetic}\index{Matrix_arithmetic@{Matrix\_\-arithmetic}}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf status} {\bf mat\_\-sum} ({\bf matrix} result, {\bf matrix} mat1, {\bf matrix} mat2)
+\begin{CompactList}\small\item\em MAT C = A + B;.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-substract} ({\bf matrix} result, {\bf matrix} mat1, {\bf matrix} mat2)
+\begin{CompactList}\small\item\em MAT res = mat1 - mat2.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-multiply} ({\bf matrix} prod, {\bf matrix} fact1, {\bf matrix} fact2)
+\begin{CompactList}\small\item\em MAT prod[m][p] = fact1[m][n] $\ast$ fact2[n][p]; Compute the product of two matrices.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-scalar\_\-product} ({\bf matrix} scprod, {\bf matrix} mat, {\bf real} lambda)
+\begin{CompactList}\small\item\em compute the scalar product\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{Matrix_arithmetic@{Matrix\_\-arithmetic}!mat_multiply@{mat\_\-multiply}}
+\index{mat_multiply@{mat\_\-multiply}!Matrix_arithmetic@{Matrix\_\-arithmetic}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-multiply ({\bf matrix} {\em prod}, {\bf matrix} {\em fact1}, {\bf matrix} {\em fact2})}\label{group__matrix__arithmetic_a2}
+
+
+MAT prod[m][p] = fact1[m][n] $\ast$ fact2[n][p]; Compute the product of two matrices.
+
+Compute the product of two matrices and store result in another one. The number of columns in the first factor matrix must be equal to the number of rows in the second factor matrix. The resulting product  matrix will have same number of rows as first factor and same number of columns as second factor.
+
+Let A$_{\mbox{mn}}$ and B$_{\mbox{np}}$: \[ A · B = C / A_{mn} B_{np} = C_{mp} / c_{ij} = \sum_{k=1}^n a_{ik} b_{kj} (i = 1 \ldots m; j = 1 \ldots p) \]
+
+If p == 1 (i. e. B is a vector with a single column) then A 183 x for A$_{\mbox{mn}}$ and x$_{\mbox{n1}}$ is \[ Y_{m1} / y_i = \sum_{k=1}^n a_{ik} x_k (i = 1 \ldots m) \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+prod}]a matrix to store the resulting product \item[{\em 
+fact1}]first factor to multiply \item[{\em 
+fact2}]second factor matrix to multiply\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 212 of file mat\_\-arith.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.\index{Matrix_arithmetic@{Matrix\_\-arithmetic}!mat_scalar_product@{mat\_\-scalar\_\-product}}
+\index{mat_scalar_product@{mat\_\-scalar\_\-product}!Matrix_arithmetic@{Matrix\_\-arithmetic}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-scalar\_\-product ({\bf matrix} {\em scprod}, {\bf matrix} {\em mat}, {\bf real} {\em lambda})}\label{group__matrix__arithmetic_a3}
+
+
+compute the scalar product
+
+Compute the product of a matrix by a scalar quantity and store the result in another matrix: \[ B = \lambda \cdot A (\lambda = constant) \]\[ b_{ij} = \lambda \cdot a_{ij} (i = 1 \ldots m, j = 1 \ldots n) \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+scprod}]the matrix to store the result \item[{\em 
+mat}]the matrix to multiply \item[{\em 
+lambda}]the scalar operand\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 256 of file mat\_\-arith.c.
+
+References matrix::cols, real, matrix::rows, status, and matrix::values.\index{Matrix_arithmetic@{Matrix\_\-arithmetic}!mat_substract@{mat\_\-substract}}
+\index{mat_substract@{mat\_\-substract}!Matrix_arithmetic@{Matrix\_\-arithmetic}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-substract ({\bf matrix} {\em result}, {\bf matrix} {\em mat1}, {\bf matrix} {\em mat2})}\label{group__matrix__arithmetic_a1}
+
+
+MAT res = mat1 - mat2.
+
+Substracts mat2 from mat1 and stores result in res.
+
+Subtract one matrix from another and store the result in another one. All three matrices must have the same dimensions:
+
+\[ A_{mn} - B_{mn} = E_{mn} / e_{ij} = a_{ij} - b_{ij} (i = 1 \ldots m; j = 1 \ldots n) \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+result}]The resulting substraction matrix \item[{\em 
+mat1}]Minuend matrix \item[{\em 
+mat2}]Substraend matrix\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 148 of file mat\_\-arith.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.\index{Matrix_arithmetic@{Matrix\_\-arithmetic}!mat_sum@{mat\_\-sum}}
+\index{mat_sum@{mat\_\-sum}!Matrix_arithmetic@{Matrix\_\-arithmetic}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-sum ({\bf matrix} {\em result}, {\bf matrix} {\em mat1}, {\bf matrix} {\em mat2})}\label{group__matrix__arithmetic_a0}
+
+
+MAT C = A + B;.
+
+sum two matrices and store result in another.
+
+function mat\_\-sum adds two matrices and stores the result in a separate one. Both matrices must have the same number of rows and columns:
+
+\[ \sum A_{mn} + B_{mn} = C_{mn} / c_{ij} = a_{ij} + b_{ij} (i = 1 \ldots m, j = 1 \ldots n) \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+result}]a matrix to store the sum \item[{\em 
+mat1}]sumand \item[{\em 
+mat2}]sumand\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 91 of file mat\_\-arith.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.

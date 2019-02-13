@@ -1,0 +1,99 @@
+\section{Matrix\_\-operations}
+\label{group__matrix__operations}\index{Matrix_operations@{Matrix\_\-operations}}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+public {\bf status} {\bf mat\_\-assign} ({\bf matrix} dest, {\bf matrix} orig)
+\begin{CompactList}\small\item\em MAT dest = orig.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-transpose} ({\bf matrix} trn, {\bf matrix} mat)
+\begin{CompactList}\small\item\em MAT trn = TRN(mat) Compute the transpose of a matrix.\item\end{CompactList}\item 
+public {\bf status} {\bf mat\_\-invert} ({\bf matrix} B, {\bf matrix} C)
+\begin{CompactList}\small\item\em MAT B = INV ( C );.\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{Matrix_operations@{Matrix\_\-operations}!mat_assign@{mat\_\-assign}}
+\index{mat_assign@{mat\_\-assign}!Matrix_operations@{Matrix\_\-operations}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-assign ({\bf matrix} {\em dest}, {\bf matrix} {\em orig})}\label{group__matrix__operations_a0}
+
+
+MAT dest = orig.
+
+Transfer ([m] x [n]) elements from 2 to 1.
+
+Assigns the values of one matrix to another. Both matrices must have the same dimensions, otherwise an error result will occur.
+
+If the origin matrix is NULL, then the destination matrix will be set to the null matrix (i.e. all of its elements initialized to zero).\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+dest}]the destination matrix \item[{\em 
+orig}]the origin matrix\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+SUCCESS if all went well, an error code otherwise \end{Desc}
+
+
+Definition at line 84 of file mat\_\-ops.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, mat\_\-init(), real, matrix::rows, status, SUCCESS, and matrix::values.
+
+Referenced by mat\_\-invert().\index{Matrix_operations@{Matrix\_\-operations}!mat_invert@{mat\_\-invert}}
+\index{mat_invert@{mat\_\-invert}!Matrix_operations@{Matrix\_\-operations}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-invert ({\bf matrix} {\em B}, {\bf matrix} {\em C})}\label{group__matrix__operations_a2}
+
+
+MAT B = INV ( C );.
+
+Computes the inverted matrix of C, which is a square matrix n x n and stores the result on B. The algorithm employed is a modification of Gauss' method. This is probably not the best (nor is it the nicest implementation), but for the moment will do.
+
+Given the identity matrix I$_{\mbox{nn}}$, we may think of another such that
+
+A B = B A = I =$>$ B = A$^{\mbox{-1}}$
+
+A A$^{\mbox{-1}}$ = I = A$^{\mbox{-1}}$ A
+
+Using the cofactors of A$_{\mbox{ij}}$ we may compute
+
+A$^{\mbox{-1}}$ = 1 / $|$A$|$ 183 adj(A)
+
+(calculating through the adjunct matrix). If $|$A$|$ = 0 then it is not defined and A is SINGULAR.
+
+The inverse of a matrix A, if it exists, is unique and may be found: We first form for A$_{\mbox{nn}}$ the matrix A$_{\mbox{n x 2n}}$ \[ (A, I) = \pmatrix { a_{11} & a_{12} & \cdots & a_{1n} & 1 & 0 & \cdots & 0 \cr a_{21} & a_{22} & \cdots & a_{2n} & 0 & 1 & \cdots & 0 \cr \vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \ddots & 0 \cr a_{n1} & a_{n2} & \cdots & a_{nn} & 0 & 0 & \cdots & 1 \cr } \] That is, the left half is A and the right half I, the identity matrix. Using a modified Gauss method we transform the former matrix into \[ (I, B) = \pmatrix { 1 & 0 & \cdots & 0 & b_{11} & b_{12} & \cdots & b_{1n}\cr 0 & 1 & \cdots & 0 & b_{21} & b_{22} & \cdots & b_{2n}\cr \vdots & \vdots & \ddots & 0 & \vdots & \vdots & \ddots & \vdots\cr 0 & 0 & \cdots & 1 & b_{n1} & b_{n2} & \cdots & b_{nn}\cr } \] Now the left half is I and the right half, B is the inverse of A.
+
+To avoid changing matrix C we get first a working copy that we store in matrix A, whose space is reserved ex-profeso and is freed upon termination.
+
+@callgraph 
+
+Definition at line 224 of file mat\_\-ops.c.
+
+References FALSE, mat\_\-alloc(), mat\_\-assign(), mat\_\-free(), mat\_\-identity(), MAT\_\-NOMEMORY, MAT\_\-SINGULAR, real, matrix::rows, status, TRUE, and matrix::values.\index{Matrix_operations@{Matrix\_\-operations}!mat_transpose@{mat\_\-transpose}}
+\index{mat_transpose@{mat\_\-transpose}!Matrix_operations@{Matrix\_\-operations}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}public {\bf status} mat\_\-transpose ({\bf matrix} {\em trn}, {\bf matrix} {\em mat})}\label{group__matrix__operations_a1}
+
+
+MAT trn = TRN(mat) Compute the transpose of a matrix.
+
+The transpose A$^{\mbox{T}}$ of a matrix A is A' = A$^{\mbox{T}}$ / row A' = col A =$>$
+
+(A)$_{\mbox{ij}}$ = (A$^{\mbox{T}}$)$_{\mbox{ji}}$
+
+Thus, if A$_{\mbox{m183n}}$, then A'$_{\mbox{n.m}}$ =$>$
+
+If A 183 B = C -$>$ C' = A' 183 B'
+
+We may therefore describe a column vector as a row vector
+
+\[ \pmatrix { x_1 \cr x_2 \cr \cdots \cr x_{n-1} \cr x_n \cr } = \pmatrix {x_1 & x_2 & \cdots & x_n \cr } \]\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+trn}]a matrix where we will store the transpose \item[{\em 
+mat}]the matrix whose transpose we want to take \end{description}
+\end{Desc}
+
+
+Definition at line 147 of file mat\_\-ops.c.
+
+References matrix::cols, MAT\_\-BOUNDSCHECK, real, matrix::rows, status, SUCCESS, and matrix::values.

@@ -1,0 +1,71 @@
+\section{matrix Struct Reference}
+\label{structmatrix}\index{matrix@{matrix}}
+Implementation of a 2D-matrix. 
+
+
+{\tt \#include $<$matrix.h$>$}
+
+\subsection*{Data Fields}
+\begin{CompactItemize}
+\item 
+int {\bf rows}
+\item 
+int {\bf cols}
+\item 
+{\bf real} $\ast$$\ast$ {\bf values}
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Implementation of a 2D-matrix.
+
+A matrix A is a set of values grouped as a table arranged by rows and columns: a matrix m x n (rows x columns) is \[ A = \pmatrix { a_{11} & a_{12} & \cdots & a_{1n} \cr a_{21} & a_{22} & \cdots & a_{2n} \cr \vdots & \vdots & \ddots & \vdots \cr a_{m1} & a_{m2} & \cdots & a_{mn} \cr } \] where a$_{\mbox{ij}}$ are the elements of A (i = 1..m, j = 1..n) Vectors are matrices with only one row or column: they only need one subindex.
+
+Sometimes it may be convenient to consider special rows or columns:
+
+R$_{\mbox{i}}$(A) -- row i.
+
+C$_{\mbox{j}}$(A) -- row j.
+
+\begin{Desc}
+\item[Note: ]\par
+Please, note that all subindexes are offset at one (1) \end{Desc}
+
+
+
+
+Definition at line 106 of file matrix.h.
+
+\subsection{Field Documentation}
+\index{matrix@{matrix}!cols@{cols}}
+\index{cols@{cols}!matrix@{matrix}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int matrix::cols}\label{structmatrix_m1}
+
+
+number of columns 
+
+Definition at line 108 of file matrix.h.
+
+Referenced by mat\_\-alloc(), mat\_\-assign(), mat\_\-cols(), mat\_\-element(), mat\_\-identity(), mat\_\-init(), mat\_\-is\_\-identity(), mat\_\-is\_\-null(), mat\_\-is\_\-square(), mat\_\-is\_\-symmetric(), mat\_\-multiply(), mat\_\-scalar\_\-product(), mat\_\-set(), mat\_\-substract(), mat\_\-sum(), and mat\_\-transpose().\index{matrix@{matrix}!rows@{rows}}
+\index{rows@{rows}!matrix@{matrix}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int matrix::rows}\label{structmatrix_m0}
+
+
+number of rows 
+
+Definition at line 107 of file matrix.h.
+
+Referenced by mat\_\-alloc(), mat\_\-assign(), mat\_\-element(), mat\_\-free(), mat\_\-identity(), mat\_\-init(), mat\_\-invert(), mat\_\-is\_\-identity(), mat\_\-is\_\-null(), mat\_\-is\_\-square(), mat\_\-is\_\-symmetric(), mat\_\-multiply(), mat\_\-row(), mat\_\-rows(), mat\_\-scalar\_\-product(), mat\_\-set(), mat\_\-substract(), mat\_\-sum(), and mat\_\-transpose().\index{matrix@{matrix}!values@{values}}
+\index{values@{values}!matrix@{matrix}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf real}$\ast$$\ast$ matrix::values}\label{structmatrix_m2}
+
+
+matrix values arranged as an array of real vectors 
+
+Definition at line 109 of file matrix.h.
+
+Referenced by mat\_\-alloc(), mat\_\-assign(), mat\_\-element(), mat\_\-free(), mat\_\-identity(), mat\_\-init(), mat\_\-invert(), mat\_\-is\_\-identity(), mat\_\-is\_\-null(), mat\_\-is\_\-symmetric(), mat\_\-multiply(), mat\_\-row(), mat\_\-scalar\_\-product(), mat\_\-set(), mat\_\-substract(), mat\_\-sum(), mat\_\-transpose(), and mat\_\-values().
+
+The documentation for this struct was generated from the following file:\begin{CompactItemize}
+\item 
+{\bf matrix.h}\end{CompactItemize}
